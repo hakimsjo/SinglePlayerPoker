@@ -176,30 +176,30 @@
             transform: none !important;
         }
         /* Message box styling (now a Bootstrap Modal) */
-        .message-box .modal-content {
+        .modal-content { /* Removed .message-box prefix */
             background-color: #2d3748;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
             color: #e2e8f0;
         }
-        .message-box .modal-header {
+        .modal-header { /* Removed .message-box prefix */
             border-bottom: none;
         }
-        .message-box .modal-title {
+        .modal-title { /* Removed .message-box prefix */
             color: #63b3ed;
             font-weight: 700;
         }
-        .message-box .btn-close {
+        .btn-close { /* Removed .message-box prefix */
             filter: invert(1) grayscale(1) brightness(2);
         }
-        .message-box .modal-body {
+        .modal-body { /* Removed .message-box prefix */
             font-size: 1.1rem;
         }
-        .message-box .modal-footer {
+        .modal-footer { /* Removed .message-box prefix */
             border-top: none;
             justify-content: center;
         }
-        .message-box .modal-footer .btn {
+        .modal-footer .btn { /* Removed .message-box prefix */
             background-color: #4299e1;
             color: white;
             padding: 10px 20px;
@@ -208,7 +208,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        .message-box .modal-footer .btn:hover {
+        .modal-footer .btn:hover { /* Removed .message-box prefix */
             background-color: #3182ce;
         }
 
@@ -309,67 +309,6 @@
             margin-left: 8px;
         }
 
-        /* Hamburger Menu Styles */
-        #hamburger-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 1050; /* Higher than Bootstrap's offcanvas backdrop (1040) */
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background-color 0.2s;
-        }
-        #hamburger-button:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        #hamburger-button svg {
-            width: 30px;
-            height: 30px;
-            fill: #e2e8f0;
-        }
-
-        /* Override Bootstrap's offcanvas default background and text color */
-        .offcanvas {
-            background-color: #2d3748 !important;
-            color: #e2e8f0 !important;
-        }
-        .offcanvas-header {
-            border-bottom: 1px solid #4a5568;
-        }
-        .offcanvas-title {
-            color: #63b3ed !important;
-            font-weight: 700;
-        }
-        .btn-close {
-            filter: invert(1) grayscale(1) brightness(2);
-        }
-
-        .menu-item { /* Unified style for menu items */
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
-            background-color: #4a5568;
-            color: white;
-            font-weight: 600;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border: none;
-        }
-        .menu-item:hover {
-            background-color: #3182ce;
-        }
-        .menu-section-hidden {
-            display: none !important;
-        }
-
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .game-container {
@@ -423,25 +362,13 @@
                 align-items: center;
                 text-align: center;
             }
-            #hamburger-button {
-                top: 10px;
-                left: 10px;
-            }
         }
     </style>
 </head>
 <body class="d-flex justify-content-center align-items-center min-vh-100 bg-gray-900 text-gray-100 p-3">
 
     <div class="game-wrapper">
-        <!-- Hamburger Button -->
-        <button id="hamburger-button" class="btn btn-dark p-2 rounded-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
-            <svg viewBox="0 0 100 80" width="30" height="30">
-                <rect width="100" height="15" rx="8" fill="#e2e8f0"></rect>
-                <rect y="30" width="100" height="15" rx="8" fill="#e2e8f0"></rect>
-                <rect y="60" width="100" height="15" rx="8" fill="#e2e8f0"></rect>
-            </svg>
-        </button>
-
+        <!-- Hamburger Button (Removed from here, as it's no longer needed for offcanvas) -->
         <!-- Side Menu (Offcanvas) -->
         <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
             <div class="offcanvas-header">
@@ -449,17 +376,8 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body d-flex flex-column gap-3">
-                <div id="main-menu-options" class="d-flex flex-column gap-3">
-                    <button id="toggle-sound-button" class="menu-item">🔊 Sound On</button>
-                    <button id="help-button" class="menu-item">❓ Help</button>
-                    <button id="lang-menu-button" class="menu-item">🌐 Language</button>
-                </div>
-
-                <div id="language-options" class="d-flex flex-column gap-3 menu-section-hidden">
-                    <button id="back-button" class="menu-item">⬅️ Back</button>
-                    <button id="lang-sv-button" class="menu-item">Svenska 🇸🇪</button>
-                    <button id="lang-en-button" class="menu-item">English 🇬🇧</button>
-                </div>
+                <!-- Main menu options (now directly in body, no longer hidden) -->
+                <!-- Language options (now directly in body, no longer hidden) -->
             </div>
         </div>
 
@@ -474,7 +392,7 @@
                 </div>
                 <!-- High Score List moved here -->
                 <div id="high-score-list" class="high-score-list">
-                    <h2 id="high-score-title" class="text-xl font-bold text-blue-400 text-center mb-2">🏆 <span id="high-score-title-text">High Score</span> <span id="saved-total-score-display"></span></h2>
+                    <h2 id="high-score-title">🏆 <span id="high-score-title-text">High Score</span> <span id="saved-total-score-display"></span></h2>
                     <ul id="score-list-items" class="list-unstyled">
                         <!-- Scores will be loaded here with JavaScript -->
                     </ul>
@@ -497,6 +415,10 @@
                 <button id="stand-button" class="game-button btn btn-success">✋ Stand</button>
                 <button id="continue-game-button" class="game-button btn btn-warning">▶️ Continue Game</button>
                 <button id="new-game-button" class="game-button btn btn-info hidden">✨ New Game</button>
+                <!-- New individual buttons for sound, help, and language -->
+                <button id="toggle-sound-button" class="game-button btn btn-secondary">🔊 Sound On</button>
+                <button id="help-button" class="game-button btn btn-secondary">❓ Help</button>
+                <button id="language-toggle-button" class="game-button btn btn-secondary">English 🇬🇧</button>
             </div>
         </div>
     </div>
@@ -779,13 +701,15 @@
                     Good luck!
                 `,
                 langMenuTitle: "🌐 Language", // New text for language menu title
-                backButton: "Back" // Text for back button
+                backButton: "Back", // Text for back button
+                langToggleEn: "English 🇬🇧", // Text for language toggle button when current is Swedish
+                langToggleSv: "Svenska 🇸🇪"  // Text for language toggle button when current is English
             },
             sv: {
                 gameTitle: "♠️ Single Player Poker", // Updated title
                 drawsLeft: "Drag kvar:",
                 bestHand: "Bästa hand:",
-                discardButton: "🔄 Byt valda kort",
+                discardButton: "� Byt valda kort",
                 standButton: "✋ Stanna",
                 continueButton: "▶️ Fortsätt Spel",
                 newGameButton: "✨ Nytt Spel",
@@ -836,7 +760,9 @@
                     Lycka till!
                 `,
                 langMenuTitle: "🌐 Språk", // New text for language menu title
-                backButton: "Tillbaka" // Text for back button
+                backButton: "Tillbaka", // Text for back button
+                langToggleEn: "English 🇬🇧", // Text for language toggle button when current is Swedish
+                langToggleSv: "Svenska 🇸🇪"  // Text for language toggle button when current is English
             }
         };
 
@@ -865,6 +791,7 @@
             newGameButton: null,
             toggleSoundButton: null,
             helpButton: null, // New help button DOM element
+            languageToggleButton: null, // New language toggle button
             remainingCardsLabelEl: null,
             remainingCardsEl: null,
             highScoreTitleEl: null,
@@ -872,13 +799,13 @@
             savedTotalScoreDisplayEl: null, // The span inside H2 for saved score
             scoreListItemsEl: null,
             totalScoreEl: null,
-            menuTitleEl: null,
-            langSvButton: null,
-            langEnButton: null,
-            mainMenuOptionsEl: null, // Reference to the main menu options container
-            languageOptionsEl: null, // Reference to the language options container
-            langMenuButton: null, // Reference to the Language menu button
-            backButton: null, // Reference to the Back button in language menu
+            menuTitleEl: null, // No longer used for offcanvas title
+            langSvButton: null, // No longer separate buttons
+            langEnButton: null, // No longer separate buttons
+            mainMenuOptionsEl: null, // No longer used for menu sections
+            languageOptionsEl: null, // No longer used for menu sections
+            langMenuButton: null, // No longer used for menu navigation
+            backButton: null, // No longer used for menu navigation
 
             // New method to initialize DOM elements
             initializeDOMElements() {
@@ -894,6 +821,7 @@
                 this.newGameButton = document.getElementById('new-game-button');
                 this.toggleSoundButton = document.getElementById('toggle-sound-button');
                 this.helpButton = document.getElementById('help-button'); // Initialize new button
+                this.languageToggleButton = document.getElementById('language-toggle-button'); // Initialize new language toggle button
                 this.remainingCardsLabelEl = document.getElementById('remaining-cards-label');
                 this.remainingCardsEl = this.remainingCardsLabelEl ? this.remainingCardsLabelEl.querySelector('#remaining-cards') : null;
                 
@@ -904,16 +832,15 @@
 
                 this.scoreListItemsEl = document.getElementById('score-list-items');
                 this.totalScoreEl = document.getElementById('total-score');
-                this.menuTitleEl = document.getElementById('offcanvasMenuLabel'); // Bootstrap offcanvas title
-                this.langSvButton = document.getElementById('lang-sv-button');
-                this.langEnButton = document.getElementById('lang-en-button');
-                this.playerHandEl = document.getElementById('player-hand');
+                // this.menuTitleEl = document.getElementById('offcanvasMenuLabel'); // No longer used for offcanvas title
+                // this.langSvButton = document.getElementById('lang-sv-button'); // No longer separate buttons
+                // this.langEnButton = document.getElementById('lang-en-button'); // No longer separate buttons
 
-                // New menu element references
-                this.mainMenuOptionsEl = document.getElementById('main-menu-options');
-                this.languageOptionsEl = document.getElementById('language-options');
-                this.langMenuButton = document.getElementById('lang-menu-button');
-                this.backButton = document.getElementById('back-button');
+                // No longer needed for menu sections
+                // this.mainMenuOptionsEl = document.getElementById('main-menu-options');
+                // this.languageOptionsEl = document.getElementById('language-options');
+                // this.langMenuButton = document.getElementById('lang-menu-button');
+                // this.backButton = document.getElementById('back-button');
             },
 
             // Helper function to create a card DOM element
@@ -984,8 +911,16 @@
                 if (this.newGameButton) this.newGameButton.textContent = t.newGameButton;
                 if (this.toggleSoundButton) this.toggleSoundButton.textContent = this.isSoundEnabled ? t.soundOn : t.soundOff;
                 if (this.helpButton) this.helpButton.textContent = t.helpButton; // Set text for new help button
-                if (this.langMenuButton) this.langMenuButton.textContent = t.langMenuTitle; // Set text for language menu button
                 
+                // Update language toggle button
+                if (this.languageToggleButton) {
+                    if (lang === 'en') {
+                        this.languageToggleButton.innerHTML = `${t.langToggleSv} <img src="https://placehold.co/20x15/fff/000?text=SE" alt="Swedish Flag" class="flag-icon">`;
+                    } else {
+                        this.languageToggleButton.innerHTML = `${t.langToggleEn} <img src="https://placehold.co/20x15/fff/000?text=US" alt="US Flag" class="flag-icon">`;
+                    }
+                }
+
                 if (this.remainingCardsLabelEl) {
                     this.remainingCardsLabelEl.innerHTML = `${t.cardsLeft} <span id="remaining-cards"></span>`;
                     this.remainingCardsEl = document.getElementById('remaining-cards'); // Re-get reference
@@ -1009,10 +944,11 @@
                     if (this.highScoreTitleTextEl) this.highScoreTitleTextEl.textContent = t.highScoreTitle;
                 }
 
-                if (this.menuTitleEl) this.menuTitleEl.textContent = t.menuTitle; // Update offcanvas title
-                if (this.langSvButton) this.langSvButton.textContent = `${t.langSwedish} 🇸🇪`;
-                if (this.langEnButton) this.langEnButton.textContent = `${t.langEnglish} 🇬🇧`;
-                if (this.backButton) this.backButton.textContent = `⬅️ ${t.backButton}`;
+                // No longer needed for offcanvas menu title/buttons
+                // if (this.menuTitleEl) this.menuTitleEl.textContent = t.menuTitle;
+                // if (this.langSvButton) this.langSvButton.textContent = `${t.langSwedish} 🇸🇪`;
+                // if (this.langEnButton) this.langEnButton.textContent = `${t.langEnglish} 🇬🇧`;
+                // if (this.backButton) this.backButton.textContent = `⬅️ ${t.backButton}`;
 
                 // Update saved total score display
                 if (this.savedTotalScoreDisplayEl) {
@@ -1023,7 +959,7 @@
                     this.savedTotalScoreDisplayEl = document.getElementById('saved-total-score-display');
                     if (this.savedTotalScoreDisplayEl) {
                         const savedScore = getCookie('pokerTotalScore');
-                        this.savedTotalScoreDisplayEl.textContent = savedScore ? `(${savedScore}p)` : '';
+                        this.savedTotalScoreDisplayel.textContent = savedScore ? `(${savedScore}p)` : '';
                     }
                 }
 
@@ -1032,18 +968,15 @@
                 this.renderHighScoreList();
             },
 
-            // Shows the main menu options
+            // Shows the main menu options (no longer applicable with direct buttons)
             showMainMenu() {
-                if (this.mainMenuOptionsEl) this.mainMenuOptionsEl.classList.remove('menu-section-hidden');
-                if (this.languageOptionsEl) this.languageOptionsEl.classList.add('menu-section-hidden');
-                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].menuTitle; // Set offcanvas title
+                // This function is no longer directly used as there's no offcanvas menu navigation
+                // It might be called by startGame, but its effects are now minimal.
             },
 
-            // Shows the language selection options
+            // Shows the language selection options (no longer applicable with direct buttons)
             showLanguageOptions() {
-                if (this.mainMenuOptionsEl) this.mainMenuOptionsEl.classList.add('menu-section-hidden');
-                if (this.languageOptionsEl) this.languageOptionsEl.classList.remove('menu-section-hidden');
-                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].langMenuTitle; // Set offcanvas title to Language/Språk
+                // This function is no longer directly used. Language toggle is a single button.
             },
 
             // Starts a new game
@@ -1055,7 +988,7 @@
 
                 this.dealNewRound(); // Start the first round
                 this.setLanguage(this.currentLanguage); // Set language on start
-                this.showMainMenu(); // Ensure main menu is visible on game start
+                // this.showMainMenu(); // No longer needed
             },
 
             // Deals a new hand for a new round
@@ -1410,56 +1343,17 @@
             if (game.toggleSoundButton) game.toggleSoundButton.addEventListener('click', () => game.toggleSound()); // Event listener for sound button
             if (game.helpButton) game.helpButton.addEventListener('click', () => { // Event listener for help button
                 showMessageBox(game.texts[game.currentLanguage].helpDescription);
-                // Close menu after showing help
-                const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
-                if (offcanvasMenu) offcanvasMenu.hide();
             });
 
-            // Hamburger menu logic
-            const hamburgerButton = document.getElementById('hamburger-button');
-            const offcanvasMenuEl = document.getElementById('offcanvasMenu'); // Get the offcanvas element
-            const closeMenuButton = offcanvasMenuEl ? offcanvasMenuEl.querySelector('.btn-close') : null; // Get Bootstrap's close button
-
-            if (hamburgerButton) {
-                hamburgerButton.addEventListener('click', () => {
-                    // Bootstrap handles showing the offcanvas
-                    game.showMainMenu(); // Show main menu options when opening hamburger
-                });
-            }
-
-            if (closeMenuButton) {
-                closeMenuButton.addEventListener('click', () => {
-                    // Bootstrap handles hiding the offcanvas
-                });
-            }
-
-            // Language menu navigation
-            if (game.langMenuButton) {
-                game.langMenuButton.addEventListener('click', () => {
-                    game.showLanguageOptions();
-                });
-            }
-            if (game.backButton) {
-                game.backButton.addEventListener('click', () => {
-                    game.showMainMenu();
-                });
-            }
-
-            // Language selection listeners
-            if (game.langSvButton) {
-                game.langSvButton.addEventListener('click', () => {
-                    game.setLanguage('sv');
-                    // Hide offcanvas after language selection
-                    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
-                    if (offcanvasMenu) offcanvasMenu.hide();
-                });
-            }
-            if (game.langEnButton) {
-                game.langEnButton.addEventListener('click', () => {
-                    game.setLanguage('en');
-                    // Hide offcanvas after language selection
-                    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
-                    if (offcanvasMenu) offcanvasMenu.hide();
+            // Language toggle button logic
+            const languageToggleButton = document.getElementById('language-toggle-button');
+            if (languageToggleButton) {
+                languageToggleButton.addEventListener('click', () => {
+                    if (game.currentLanguage === 'en') {
+                        game.setLanguage('sv');
+                    } else {
+                        game.setLanguage('en');
+                    }
                 });
             }
 
