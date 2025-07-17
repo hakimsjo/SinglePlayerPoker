@@ -72,7 +72,7 @@
         .card {
             width: 100px;
             height: 140px;
-            background-color: #fff;
+            background-color: #fff; /* Fallback: White background */
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -83,7 +83,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             cursor: pointer;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            color: #2d3748; /* Dark text for cards */
+            color: #2d3748; /* Fallback: Dark text for cards */
             position: relative;
             user-select: none;
         }
@@ -953,7 +953,7 @@
                 }
 
                 if (this.menuTitleEl) this.menuTitleEl.textContent = t.menuTitle; // Update offcanvas title
-                if (this.langSvButton) this.langSvButton.textContent = `${t.langSwedish} 🇸🇪`;
+                if (this.langSvButton) this.langSvButton.textContent = `${t.langSwedish} 🇸�`;
                 if (this.langEnButton) this.langEnButton.textContent = `${t.langEnglish} 🇬🇧`;
                 if (this.backButton) this.backButton.textContent = `⬅️ ${t.backButton}`;
 
@@ -1399,3 +1399,4 @@
     </script>
 </body>
 </html>
+�
