@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Player Poker Game</title>
+    <!-- Tailwind CSS CDN for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tone.js for sound generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-wrapper { /* New wrapper to handle main layout */
+            position: relative; /* For positioning hamburger button */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1000px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .game-container {
+            background-color: #2d3748; /* Darker gray background for container */
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            width: 100%; /* Fill available width */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+        .header-area { /* New div for title, high score, and deck */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Align to top */
+            width: 100%;
+            margin-bottom: 20px; /* More space below title */
+            gap: 20px; /* Spacing between elements */
+        }
+        .left-header-content { /* New container for title and game info */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Left-align content */
+            flex-shrink: 0;
+        }
+        .header-area h1 {
+            flex-shrink: 0; /* Prevent title from shrinking */
+            text-align: left; /* Ensure left alignment */
+            margin-bottom: 8px; /* Less margin below title */
+        }
+        .game-info { /* Style for "Draws left" and "Best hand" */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* Left-align text */
+            gap: 4px; /* Less space between lines */
+        }
+        .card {
+            width: 100px;
+            height: 140px;
+            background-color: #fff;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 0 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            color: #2d3748; /* Dark text for cards */
+            position: relative;
+            user-select: none;
+        }
+        .card.selected {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            border: 3px solid #63b3ed; /* Blue border for selected cards */
+        }
+        .card.red {
+            color: #e53e3e; /* Red color for hearts and diamonds */
+        }
+        .card-rank {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+        .card-suit {
+            font-size: 2rem;
+        }
+        .card-top-left, .card-bottom-right {
+            position: absolute;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .card-top-left {
+            top: 5px;
+            left: 8px;
+        }
+        .card-bottom-right {
+            bottom: 5px;
+            right: 8px;
+            transform: rotate(180deg);
+        }
+        .deck-area {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Right-align deck info */
+            gap: 4px;
+            text-align: right; /* Text inside right-aligned */
+            flex-shrink: 0; /* Prevent deck from shrinking */
+        }
+        .deck-card {
+            width: 100px;
+            height: 140px;
+            background-color: #4a5568; /* Dark gray for card back */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            color: #cbd5e0;
+        }
+        .game-button {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            background: linear-gradient(145deg, #4299e1, #3182ce); /* Blue gradient */
+            color: white;
+            display: flex; /* Use flexbox to center emoji and text */
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Space between emoji and text */
+        }
+        .game-button:hover {
+            background: linear-gradient(145deg, #3182ce, #2c5282);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+        .game-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .game-button:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        .message-box {
+            background-color: #2d3748;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            text-align: center;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            width: 90%;
+        }
+        .message-box button {
+            background-color: #4299e1;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .message-box button:hover {
+            background-color: #3182ce;
+        }
+
+        /* New CSS for animations */
+        .card-exit {
+            animation: cardExit 0.3s forwards ease-out;
+        }
+
+        .card-enter {
+            animation: cardEnter 0.3s forwards ease-in;
+            opacity: 0; /* Start invisible */
+            transform: translateY(20px) scale(0.8); /* Start slightly below and smaller */
+        }
+
+        @keyframes cardExit {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px) scale(0.5) rotate(15deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes cardEnter {
+            0% {
+                transform: translateY(50px) scale(0.5) rotate(-15deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* High Score List Styling */
+        #high-score-list {
+            background-color: #1a202c;
+            padding: 10px; /* Adjusted padding to fit better in the middle */
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            flex-grow: 1; /* Allow it to take available space */
+            max-width: 300px; /* Limit max width for symmetry */
+            max-height: 180px; /* Make it scrollable */
+            overflow-y: auto; /* Enable vertical scrolling */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #high-score-list h2 {
+            font-size: 1.4rem; /* Smaller heading to fit better */
+            font-weight: 700;
+            color: #63b3ed;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #high-score-list ul {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1; /* Allow the list to grow within its container */
+            overflow-y: auto; /* Ensure the list is scrollable inside */
+            padding-right: 5px; /* Make space for the scrollbar */
+        }
+        #high-score-list li {
+            background-color: #2d3748;
+            padding: 6px 10px; /* Made rows smaller */
+            border-radius: 6px; /* Less rounded corners */
+            margin-bottom: 4px; /* Less margin */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem; /* Smaller text size */
+        }
+        #high-score-list li:last-child {
+            margin-bottom: 0;
+        }
+        #high-score-list li span:first-child {
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+        #high-score-list li span:last-child {
+            color: #90cdf4;
+        }
+        #total-score {
+            font-size: 1.2rem; /* Smaller total score text */
+            font-weight: 700;
+            color: #a7f3d0; /* Light green for total score */
+            text-align: center;
+            margin-top: 10px; /* Less top margin */
+            padding-top: 8px; /* Less padding */
+            border-top: 1px solid #4a5568;
+        }
+        #saved-total-score-display { /* Style for saved total score */
+            font-size: 1rem; /* Adjust font size to fit in h2 */
+            font-weight: 600;
+            color: #cbd5e0;
+            margin-left: 8px; /* Space from the main title text */
+        }
+
+        /* Hamburger Menu Styles */
+        #hamburger-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1001; /* Above side menu */
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        #hamburger-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        #hamburger-button svg {
+            width: 30px;
+            height: 30px;
+            fill: #e2e8f0; /* White color */
+        }
+
+        #side-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100%;
+            background-color: #2d3748;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transform: translateX(-100%); /* Hidden by default */
+            transition: transform 0.3s ease-in-out;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        #side-menu.open {
+            transform: translateX(0); /* Visible when open */
+        }
+        #side-menu .close-button {
+            align-self: flex-end;
+            background-color: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        #side-menu .close-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .menu-item { /* Unified style for menu items */
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background-color: #4a5568;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .menu-item:hover {
+            background-color: #3182ce;
+        }
+        .menu-section-hidden {
+            display: none !important;
+        }
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none; /* Hidden by default */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        #overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .player-hand {
+                flex-wrap: wrap;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+            .card {
+                width: 80px;
+                height: 120px;
+                margin: 5px;
+            }
+            .deck-card {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+            .game-button {
+                width: 100%;
+            }
+            .header-area {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            .header-area h1 {
+                text-align: center; /* Center title on small screens */
+            }
+            .left-header-content {
+                align-items: center; /* Center content on small screens */
+                order: 1; /* Title and info first */
+            }
+            .game-info {
+                align-items: center; /* Center text on small screens */
+            }
+            #high-score-list {
+                max-width: 90%; /* Adjust width for small screens */
+                max-height: 150px; /* Adjust height for small screens */
+                order: 3; /* Place it below title and deck on small screens for better flow */
+            }
+            .deck-area {
+                order: 2; /* Place deck below title but before high score on small screens */
+                align-items: center; /* Center deck info on small screens */
+                text-align: center;
+            }
+            #hamburger-button {
+                top: 10px;
+                left: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-height-screen bg-gray-900 text-gray-100 p-5">
+
+    <div class="game-wrapper">
+        <!-- Hamburger Button -->
+        <button id="hamburger-button">
+            <svg viewBox="0 0 100 80" width="40" height="40">
+                <rect width="100" height="15" rx="8"></rect>
+                <rect y="30" width="100" height="15" rx="8"></rect>
+                <rect y="60" width="100" height="15" rx="8"></rect>
+            </svg>
+        </button>
+
+        <!-- Side Menu -->
+        <div id="side-menu">
+            <button class="close-button" id="close-menu-button">&times;</button>
+            <div class="text-2xl font-bold text-blue-400 mb-4" id="menu-title">Menu</div>
+
+            <div id="main-menu-options">
+                <button id="toggle-sound-button" class="menu-item">🔊 Sound On</button>
+                <button id="help-button" class="menu-item">❓ Help</button>
+                <button id="lang-menu-button" class="menu-item">🌐 Language</button>
+            </div>
+
+            <div id="language-options" class="menu-section-hidden">
+                <button id="back-button" class="menu-item">⬅️ Back</button>
+                <button id="lang-sv-button" class="menu-item">Svenska 🇸🇪</button>
+                <button id="lang-en-button" class="menu-item">English 🇬🇧</button>
+            </div>
+        </div>
+
+        <!-- Overlay for closing menu -->
+        <div id="overlay"></div>
+
+        <div class="game-container">
+            <div class="header-area">
+                <div class="left-header-content">
+                    <h1 class="text-4xl font-bold text-blue-400" id="game-title">♠️ Single Player Poker</h1>
+                    <div class="game-info">
+                        <div class="text-xl font-semibold" id="draw-count-label">Draws left: <span id="draw-count" class="text-blue-300">3</span></div>
+                        <div class="text-xl font-semibold" id="hand-result-label">Best hand: <span id="hand-result" class="text-green-300"></span></div>
+                    </div>
+                </div>
+                <!-- High Score List moved here -->
+                <div id="high-score-list" class="high-score-list">
+                    <h2 id="high-score-title">🏆 <span id="high-score-title-text">High Score</span> <span id="saved-total-score-display"></span></h2>
+                    <ul id="score-list-items">
+                        <!-- Scores will be loaded here with JavaScript -->
+                    </ul>
+                    <div id="total-score" class="text-xl font-bold">Total Score: 0</div>
+                </div>
+                <div class="deck-area">
+                    <div id="deck" class="deck-card flex-shrink-0">
+                        <span class="text-5xl">🃏</span>
+                    </div>
+                    <div class="text-lg font-medium text-gray-400" id="remaining-cards-label">Cards left: <span id="remaining-cards">52</span></div>
+                </div>
+            </div>
+
+            <div id="player-hand" class="player-hand flex justify-center flex-wrap gap-4 mb-8">
+                <!-- Cards will be loaded here with JavaScript -->
+            </div>
+
+            <div class="controls flex flex-col md:flex-row gap-4 w-full justify-center">
+                <button id="draw-button" class="game-button">🔄 Discard selected cards</button>
+                <button id="stand-button" class="game-button bg-green-600 hover:bg-green-700">✋ Stand</button>
+                <button id="continue-game-button" class="game-button bg-yellow-600 hover:bg-yellow-700">▶️ Continue Game</button>
+                <button id="new-game-button" class="game-button bg-purple-600 hover:bg-purple-700 hidden">✨ New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message box for warnings/information -->
+    <div id="message-box" class="message-box">
+        <p id="message-text" class="text-lg font-medium"></p>
+        <button id="message-ok-button">OK</button>
+    </div>
+
+    <script>
+        // Cookie functions
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        function eraseCookie(name) {
+            document.cookie = name + '=; Max-Age=-99999999;';
+        }
+
+        // Function to show message box
+        function showMessageBox(message) {
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            const messageOkButton = document.getElementById('message-ok-button');
+
+            messageText.textContent = message;
+            messageBox.style.display = 'flex'; // Show message box
+
+            messageOkButton.onclick = () => {
+                messageBox.style.display = 'none'; // Hide message box when OK is clicked
+            };
+        }
+
+        // Card Class
+        class Card {
+            constructor(suit, rank) {
+                this.suit = suit; // Suit: 'H' (Hearts), 'D' (Diamonds), 'C' (Clubs), 'S' (Spades)
+                this.rank = rank; // Rank: '2', '3', ..., '10', 'J', 'Q', 'K', 'A'
+            }
+
+            // Returns a string representation of the card (e.g., "A♠")
+            toString() {
+                return `${this.rank}${this.getSuitSymbol()}`;
+            }
+
+            // Returns the symbol for the suit
+            getSuitSymbol() {
+                switch (this.suit) {
+                    case 'H': return '♥';
+                    case 'D': return '♦';
+                    case 'C': return '♣';
+                    case 'S': return '♠';
+                    default: return '';
+                }
+            }
+
+            // Checks if the card is red (Hearts or Diamonds)
+            isRed() {
+                return this.suit === 'H' || this.suit === 'D';
+            }
+        }
+
+        // Deck Class
+        class Deck {
+            constructor() {
+                this.cards = [];
+                this.resetCardsOnly(); // Fill the deck with cards in order
+                this.shuffle(); // Shuffle the deck immediately after filling
+            }
+
+            // Shuffles the deck using the Fisher-Yates algorithm
+            shuffle() {
+                for (let i = this.cards.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]]; // Swap places
+                }
+            }
+
+            // Creates a standard 52-card deck WITHOUT shuffling it
+            resetCardsOnly() {
+                const suits = ['H', 'D', 'C', 'S'];
+                const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+                this.cards = []; // Ensure the deck is empty before filling
+                for (const suit of suits) {
+                    for (const rank of ranks) {
+                        this.cards.push(new Card(suit, rank));
+                    }
+                }
+            }
+
+            // Resets the deck completely (fills and shuffles)
+            reset() {
+                this.resetCardsOnly();
+                this.shuffle();
+            }
+
+            // Draws a card from the top of the deck
+            draw() {
+                if (this.cards.length === 0) {
+                    showMessageBox(game.texts[game.currentLanguage].deckEmptyMessage);
+                    return null;
+                }
+                return this.cards.pop();
+            }
+
+            // Returns the number of cards left in the deck
+            remaining() {
+                return this.cards.length;
+            }
+        }
+
+        // Tone.js synth for card dealing sound
+        const cardDealSynth = new Tone.NoiseSynth({
+            noise: {
+                type: "white" // White noise for a broad frequency spectrum
+            },
+            envelope: {
+                attack: 0.001, // Very fast start
+                decay: 0.2,   // Longer decay for a more drawn-out sound
+                sustain: 0,   // No sustain
+                release: 0.15 // Longer release for decay
+            },
+            filter: { // Add a filter to shape the noise
+                type: "bandpass",
+                frequency: 1500, // Higher frequency for a sharper sound
+                Q: 0.8 // Slightly lower Q for broader sound
+            }
+        }).toDestination();
+
+        let lastCardDealSoundTime = 0;
+        const cardDealSoundCooldown = 0.3; // Increased cooldown to 300ms to match longer sound
+
+        // Function to play card dealing sound
+        async function playCardDealSound() {
+            if (game.isSoundEnabled) {
+                // Ensure audio context is running
+                if (Tone.context.state !== 'running') {
+                    try {
+                        await Tone.start();
+                        console.log("Audio context started successfully from playCardDealSound.");
+                    } catch (e) {
+                        console.error("Error starting audio context from playCardDealSound:", e);
+                        return; // Abort if context could not be started
+                    }
+                }
+
+                const now = Tone.now();
+                if (now - lastCardDealSoundTime > cardDealSoundCooldown) {
+                    console.log("Playing card deal sound at:", now); // Debugging log
+                    cardDealSynth.triggerAttackRelease("0.2", now); // Increased duration to 0.2 seconds
+                    lastCardDealSoundTime = now;
+                } else {
+                    console.log("Card deal sound skipped due to cooldown."); // Debugging log
+                }
+            } else {
+                console.log("Card deal sound not played. Enabled:", game.isSoundEnabled, "Context state:", Tone.context.state); // Debugging log
+            }
+        }
+
+        // Text content for different languages
+        const texts = {
+            en: {
+                gameTitle: "♠️ Single Player Poker", // Updated title
+                drawsLeft: "Draws left:",
+                bestHand: "Best hand:",
+                discardButton: "🔄 Discard selected cards",
+                standButton: "✋ Stand",
+                continueButton: "▶️ Continue Game",
+                newGameButton: "✨ New Game",
+                soundOn: "🔊 Sound On",
+                soundOff: "🔇 Sound Off",
+                cardsLeft: "Cards left:",
+                highScoreTitle: "High Score", // Changed to just text, emoji is in HTML
+                savedTotalScore: "Saved Total Score:", // New text
+                handLabel: "Hand",
+                pointsLabel: "Points:",
+                totalScore: "Total Score:",
+                deckEmptyMessage: "The deck is empty!",
+                selectCardsMessage: "Select at least one card to discard.",
+                couldNotDiscardMessage: "The deck is empty, could not discard all cards.",
+                allDrawsUsedMessage: (totalScore) => `Cards are out! Game over. 🎉 Your total score: ${totalScore}`,
+                gameOverMessage: (totalScore) => `Game over. 🎉 Your total score: ${totalScore}`,
+                standMessage: "You chose to stand. Your final hand is displayed.",
+                menuTitle: "Menu",
+                helpButton: "❓ Help", // New text for help button
+                helpDescription: `
+                    Welcome to Single Player Poker!
+                    
+                    The goal is to get the best possible poker hand.
+                    
+                    How to Play:
+                    1.  You start with 5 cards.
+                    2.  Click on the cards you want to discard (they will be highlighted).
+                    3.  Click "Discard selected cards" to get new cards from the deck.
+                    4.  You have 3 draws per game.
+                    5.  You can "Stand" at any time to end your current hand.
+                    6.  When a hand ends (after 3 draws or you stand), your hand's score is added to the High Score list.
+                    7.  Click "Continue Game" to deal a new hand from the remaining cards in the deck.
+                    8.  The game ends when there are not enough cards left to deal a full hand (5 cards).
+                    9.  Your total score is saved and displayed.
+                    
+                    Poker Hand Ranks (Highest to Lowest):
+                    - Royal Straight Flush (10)
+                    - Straight Flush (9)
+                    - Four of a Kind (8)
+                    - Full House (7)
+                    - Flush (6)
+                    - Straight (5)
+                    - Three of a Kind (4)
+                    - Two Pair (3)
+                    - One Pair (2)
+                    - High Card (1)
+                    
+                    Good luck!
+                `,
+                langMenuTitle: "🌐 Language" // New text for language menu title
+            },
+            sv: {
+                gameTitle: "♠️ Single Player Poker", // Updated title
+                drawsLeft: "Drag kvar:",
+                bestHand: "Bästa hand:",
+                discardButton: "🔄 Byt valda kort",
+                standButton: "✋ Stanna",
+                continueButton: "▶️ Fortsätt Spel",
+                newGameButton: "✨ Nytt Spel",
+                soundOn: "🔊 Ljud På",
+                soundOff: "🔇 Ljud Av",
+                cardsLeft: "Kort kvar:",
+                highScoreTitle: "High Score", // Changed to just text, emoji is in HTML
+                savedTotalScore: "Sparad total poäng:", // New text
+                handLabel: "Hand",
+                pointsLabel: "Poäng:",
+                totalScore: "Total Poäng:",
+                deckEmptyMessage: "Kortleken är tom!",
+                selectCardsMessage: "Välj minst ett kort att byta ut.",
+                couldNotDiscardMessage: "Kortleken är tom, kunde inte byta alla kort.",
+                allDrawsUsedMessage: (totalScore) => `Korten är slut! Spelet är över. 🎉 Din totala poäng: ${totalScore}`,
+                gameOverMessage: (totalScore) => `Spelet är över. 🎉 Din totala poäng: ${totalScore}`,
+                standMessage: "Du valde att stanna. Din slutgiltiga hand visas.",
+                menuTitle: "Meny",
+                helpButton: "❓ Hjälp", // New text for help button
+                helpDescription: `
+                    Välkommen till Single Player Poker!
+                    
+                    Målet är att få den bästa möjliga pokerhanden.
+                    
+                    Så här spelar du:
+                    1.  Du börjar med 5 kort.
+                    2.  Klicka på de kort du vill göra dig av med (de markeras).
+                    3.  Klicka på "Byt valda kort" för att få nya kort från högen.
+                    4.  Du får göra 3 drag per spel.
+                    5.  Du kan "Stanna" när som helst för att avsluta din nuvarande hand.
+                    6.  När en hand är slut (efter 3 drag eller du stannar), läggs din hands poäng till i High Score-listan.
+                    7.  Klicka på "Fortsätt Spel" för att få en ny hand från de återstående korten i högen.
+                    8.  Spelet är slut när det inte finns tillräckligt med kort kvar för att dela ut en full hand (5 kort).
+                    9.  Din totala poäng sparas och visas.
+                    
+                    Pokerhandrankning (högst till lägst):
+                    - Royal Straight Flush (10)
+                    - Straight Flush (9)
+                    - Fyrtal (8)
+                    - Kåk (Full House) (7)
+                    - Färg (Flush) (6)
+                    - Stege (Straight) (5)
+                    - Triss (Three of a Kind) (4)
+                    - Tvåpar (Two Pair) (3)
+                    - Par (One Pair) (2)
+                    - Högt Kort (High Card) (1)
+                    
+                    Lycka till!
+                `,
+                langMenuTitle: "🌐 Språk" // New text for language menu title
+            }
+        };
+
+
+        // Main game object
+        const game = {
+            deck: null,
+            playerHand: [],
+            drawsRemaining: 3,
+            maxDraws: 3, // Max number of draws
+            isGameOver: false,
+            scores: [], // New array to store scores for each hand
+            isSoundEnabled: true, // Sound on by default
+            currentLanguage: 'en', // Default language is English
+            texts: texts, // Reference to the language object
+
+            // DOM Elements - Initialized in initializeDOMElements
+            gameTitleEl: null,
+            drawCountLabelEl: null,
+            drawCountEl: null,
+            handResultLabelEl: null,
+            handResultEl: null,
+            drawButton: null,
+            standButton: null,
+            continueButton: null,
+            newGameButton: null,
+            toggleSoundButton: null,
+            helpButton: null, // New help button DOM element
+            remainingCardsLabelEl: null,
+            remainingCardsEl: null,
+            highScoreTitleEl: null,
+            highScoreTitleTextEl: null, // Added for the text part of the H2
+            savedTotalScoreDisplayEl: null, // The span inside H2 for saved score
+            scoreListItemsEl: null,
+            totalScoreEl: null,
+            menuTitleEl: null,
+            langSvButton: null,
+            langEnButton: null,
+            mainMenuOptionsEl: null, // Reference to the main menu options container
+            languageOptionsEl: null, // Reference to the language options container
+            langMenuButton: null, // Reference to the Language menu button
+            backButton: null, // Reference to the Back button in language menu
+
+            // New method to initialize DOM elements
+            initializeDOMElements() {
+                this.gameTitleEl = document.getElementById('game-title');
+                this.drawCountLabelEl = document.getElementById('draw-count-label');
+                this.drawCountEl = this.drawCountLabelEl ? this.drawCountLabelEl.querySelector('#draw-count') : null;
+                this.handResultLabelEl = document.getElementById('hand-result-label');
+                this.handResultEl = this.handResultLabelEl ? this.handResultLabelEl.querySelector('#hand-result') : null;
+
+                this.drawButton = document.getElementById('draw-button');
+                this.standButton = document.getElementById('stand-button');
+                this.continueButton = document.getElementById('continue-game-button');
+                this.newGameButton = document.getElementById('new-game-button');
+                this.toggleSoundButton = document.getElementById('toggle-sound-button');
+                this.helpButton = document.getElementById('help-button'); // Initialize new button
+                this.remainingCardsLabelEl = document.getElementById('remaining-cards-label');
+                this.remainingCardsEl = this.remainingCardsLabelEl ? this.remainingCardsLabelEl.querySelector('#remaining-cards') : null;
+                
+                this.highScoreListEl = document.getElementById('high-score-list');
+                this.highScoreTitleEl = document.getElementById('high-score-title'); // Parent of high-score-title-text and saved-total-score-display
+                this.highScoreTitleTextEl = document.getElementById('high-score-title-text'); // Get the span for the text
+                this.savedTotalScoreDisplayEl = document.getElementById('saved-total-score-display'); // Get the span for saved score
+
+                this.scoreListItemsEl = document.getElementById('score-list-items');
+                this.totalScoreEl = document.getElementById('total-score');
+                this.menuTitleEl = document.getElementById('menu-title');
+                this.langSvButton = document.getElementById('lang-sv-button');
+                this.langEnButton = document.getElementById('lang-en-button');
+                this.playerHandEl = document.getElementById('player-hand');
+
+                // New menu element references
+                this.mainMenuOptionsEl = document.getElementById('main-menu-options');
+                this.languageOptionsEl = document.getElementById('language-options');
+                this.langMenuButton = document.getElementById('lang-menu-button');
+                this.backButton = document.getElementById('back-button');
+            },
+
+            // Helper function to create a card DOM element
+            createCardElement(card, index) {
+                const cardEl = document.createElement('div');
+                cardEl.classList.add('card', 'rounded-xl', 'flex', 'flex-col', 'justify-between', 'items-center', 'p-2', 'shadow-lg', 'transition-all', 'duration-200');
+                if (card.isRed()) {
+                    cardEl.classList.add('red');
+                }
+                cardEl.dataset.index = index; // Store index to know which card was selected
+
+                cardEl.innerHTML = `
+                    <div class="card-top-left">${card.rank}${card.getSuitSymbol()}</div>
+                    <div class="card-rank">${card.rank}</div>
+                    <div class="card-suit">${card.getSuitSymbol()}</div>
+                    <div class="card-bottom-right">${card.rank}${card.getSuitSymbol()}</div>
+                `;
+                cardEl.addEventListener('click', () => this.toggleCardSelection(cardEl));
+                return cardEl;
+            },
+
+            // Sets the language of the game UI
+            setLanguage(lang) {
+                this.currentLanguage = lang;
+                const t = this.texts[lang];
+
+                if (this.gameTitleEl) {
+                    this.gameTitleEl.textContent = t.gameTitle;
+                } else {
+                    console.error("Error: gameTitleEl is null. Cannot set game title. Re-initializing and trying again.");
+                    this.gameTitleEl = document.getElementById('game-title');
+                    if (this.gameTitleEl) {
+                         this.gameTitleEl.textContent = t.gameTitle;
+                    }
+                }
+                
+                if (this.drawCountLabelEl) {
+                    this.drawCountLabelEl.innerHTML = `${t.drawsLeft} <span id="draw-count" class="text-blue-300"></span>`;
+                    this.drawCountEl = document.getElementById('draw-count'); // Re-get reference
+                    if (this.drawCountEl) this.drawCountEl.textContent = this.drawsRemaining;
+                } else {
+                    console.error("Error: drawCountLabelEl is null. Cannot set draws left label.");
+                    this.drawCountLabelEl = document.getElementById('draw-count-label');
+                    if (this.drawCountLabelEl) {
+                        this.drawCountLabelEl.innerHTML = `${t.drawsLeft} <span id="draw-count" class="text-blue-300"></span>`;
+                        this.drawCountEl = document.getElementById('draw-count');
+                        if (this.drawCountEl) this.drawCountEl.textContent = this.drawsRemaining;
+                    }
+                }
+
+                if (this.handResultLabelEl) {
+                    this.handResultLabelEl.innerHTML = `${t.bestHand} <span id="hand-result" class="text-green-300"></span>`;
+                    this.handResultEl = document.getElementById('hand-result'); // Re-get reference
+                    if (this.handResultEl) this.handResultEl.textContent = this.evaluateHand(this.playerHand).name;
+                } else {
+                    console.error("Error: handResultLabelEl is null. Cannot set best hand label.");
+                    this.handResultLabelEl = document.getElementById('hand-result-label');
+                    if (this.handResultLabelEl) {
+                        this.handResultLabelEl.innerHTML = `${t.bestHand} <span id="hand-result" class="text-green-300"></span>`;
+                        this.handResultEl = document.getElementById('hand-result');
+                        if (this.handResultEl) this.handResultEl.textContent = this.evaluateHand(this.playerHand).name;
+                    }
+                }
+
+                if (this.drawButton) this.drawButton.textContent = t.discardButton;
+                if (this.standButton) this.standButton.textContent = t.standButton;
+                if (this.continueButton) this.continueButton.textContent = t.continueButton;
+                if (this.newGameButton) this.newGameButton.textContent = t.newGameButton;
+                if (this.toggleSoundButton) this.toggleSoundButton.textContent = this.isSoundEnabled ? t.soundOn : t.soundOff;
+                if (this.helpButton) this.helpButton.textContent = t.helpButton; // Set text for new help button
+                if (this.langMenuButton) this.langMenuButton.textContent = t.langMenuTitle; // Set text for language menu button
+                
+                if (this.remainingCardsLabelEl) {
+                    this.remainingCardsLabelEl.innerHTML = `${t.cardsLeft} <span id="remaining-cards"></span>`;
+                    this.remainingCardsEl = document.getElementById('remaining-cards'); // Re-get reference
+                    if (this.remainingCardsEl) this.remainingCardsEl.textContent = this.deck ? this.deck.remaining() : 52;
+                } else {
+                    console.error("Error: remainingCardsLabelEl is null. Cannot set cards left label.");
+                    this.remainingCardsLabelEl = document.getElementById('remaining-cards-label');
+                    if (this.remainingCardsLabelEl) {
+                        this.remainingCardsLabelEl.innerHTML = `${t.cardsLeft} <span id="remaining-cards"></span>`;
+                        this.remainingCardsEl = document.getElementById('remaining-cards');
+                        if (this.remainingCardsEl) this.remainingCardsEl.textContent = this.deck ? this.deck.remaining() : 52;
+                    }
+                }
+
+                // Update High Score title text
+                if (this.highScoreTitleTextEl) {
+                    this.highScoreTitleTextEl.textContent = t.highScoreTitle;
+                } else {
+                    console.error("Error: highScoreTitleTextEl is null. Cannot set high score title text.");
+                    this.highScoreTitleTextEl = document.getElementById('high-score-title-text');
+                    if (this.highScoreTitleTextEl) this.highScoreTitleTextEl.textContent = t.highScoreTitle;
+                }
+
+                if (this.menuTitleEl) this.menuTitleEl.textContent = t.menuTitle;
+                if (this.langSvButton) this.langSvButton.textContent = `${t.langSwedish} 🇸🇪`;
+                if (this.langEnButton) this.langEnButton.textContent = `${t.langEnglish} 🇬🇧`;
+                if (this.backButton) this.backButton.textContent = `⬅️ ${t.backButton}`; // Assuming 'Back' is a common concept
+
+                // Update saved total score display
+                if (this.savedTotalScoreDisplayEl) {
+                    const savedScore = getCookie('pokerTotalScore');
+                    this.savedTotalScoreDisplayEl.textContent = savedScore ? `(${savedScore}p)` : ''; // Format (XXp)
+                } else {
+                    console.error("Error: savedTotalScoreDisplayEl is null. Cannot set saved total score.");
+                    this.savedTotalScoreDisplayEl = document.getElementById('saved-total-score-display');
+                    if (this.savedTotalScoreDisplayEl) {
+                        const savedScore = getCookie('pokerTotalScore');
+                        this.savedTotalScoreDisplayEl.textContent = savedScore ? `(${savedScore}p)` : '';
+                    }
+                }
+
+
+                // Re-render high score list and total score to update labels
+                this.renderHighScoreList();
+            },
+
+            // Shows the main menu options
+            showMainMenu() {
+                if (this.mainMenuOptionsEl) this.mainMenuOptionsEl.classList.remove('menu-section-hidden');
+                if (this.languageOptionsEl) this.languageOptionsEl.classList.add('menu-section-hidden');
+                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].menuTitle; // Set menu title
+            },
+
+            // Shows the language selection options
+            showLanguageOptions() {
+                if (this.mainMenuOptionsEl) this.mainMenuOptionsEl.classList.add('menu-section-hidden');
+                if (this.languageOptionsEl) this.languageOptionsEl.classList.remove('menu-section-hidden');
+                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].langMenuTitle; // Set menu title to Language/Språk
+            },
+
+            // Starts a new game
+            startGame() {
+                this.initializeDOMElements(); // Call this first to ensure elements are ready
+                this.deck = new Deck();
+                this.scores = []; // Clear scores from previous game
+                this.isGameOver = false;
+
+                this.dealNewRound(); // Start the first round
+                this.setLanguage(this.currentLanguage); // Set language on start
+                this.showMainMenu(); // Ensure main menu is visible on game start
+            },
+
+            // Deals a new hand for a new round
+            dealNewRound() {
+                // Check if there are enough cards for a new hand
+                if (this.deck.remaining() < 5) {
+                    this.endGame(true); // Game over if cards run out
+                    return;
+                }
+
+                this.playerHand = [];
+                this.drawsRemaining = this.maxDraws;
+
+                // Show game buttons, hide continue/new game
+                if (this.drawButton) this.drawButton.classList.remove('hidden');
+                if (this.standButton) this.standButton.classList.remove('hidden');
+                if (this.newGameButton) this.newGameButton.classList.add('hidden');
+                
+                // Fortsätt-knappen är alltid synlig men inaktiveras vid ny runda
+                if (this.continueButton) this.continueButton.disabled = true; 
+
+                if (this.drawButton) this.drawButton.disabled = false;
+                if (this.standButton) this.standButton.disabled = false;
+
+                for (let i = 0; i < 5; i++) {
+                    const card = this.deck.draw();
+                    if (card) {
+                        this.playerHand.push(card);
+                    }
+                }
+                this.updateUI();
+                playCardDealSound(); // Play sound when new hand is dealt
+            },
+
+            // Updates the UI
+            updateUI() {
+                // Only render hand if not in the middle of card animation
+                if (!this.isAnimatingCards) {
+                    this.renderHand();
+                }
+                if (this.drawCountEl) this.drawCountEl.textContent = this.drawsRemaining;
+                if (this.remainingCardsEl) this.remainingCardsEl.textContent = this.deck.remaining();
+                const handEvaluation = this.evaluateHand(this.playerHand);
+                if (this.handResultEl) this.handResultEl.textContent = handEvaluation.name;
+
+                // Handle button states
+                if (this.isGameOver) {
+                    if (this.drawButton) this.drawButton.disabled = true;
+                    if (this.standButton) this.standButton.disabled = true;
+                    if (this.continueButton) this.continueButton.disabled = true; // Disable continue when game is completely over
+                    if (this.newGameButton) this.newGameButton.classList.remove('hidden'); // Show New Game button
+                } else if (this.drawsRemaining === 0) {
+                    if (this.drawButton) this.drawButton.disabled = true; // No more draws in this hand
+                    if (this.standButton) this.standButton.disabled = true; // Cannot stand if draws are out
+                    if (this.continueButton) this.continueButton.disabled = false; // Enable continue when round is over
+                    if (this.newGameButton) this.newGameButton.classList.add('hidden');
+                } else {
+                    if (this.drawButton) this.drawButton.disabled = false;
+                    if (this.standButton) this.standButton.disabled = false;
+                    if (this.continueButton) this.continueButton.disabled = true; // Inaktivera fortsätt under pågående runda
+                    if (this.newGameButton) this.newGameButton.classList.add('hidden');
+                }
+            },
+
+            // Renders the player's hand in the DOM
+            renderHand() {
+                if (this.playerHandEl) { // Add check for playerHandEl
+                    this.playerHandEl.innerHTML = ''; // Clear existing cards
+                    this.playerHand.forEach((card, index) => {
+                        const cardEl = this.createCardElement(card, index);
+                        this.playerHandEl.appendChild(cardEl);
+                    });
+                }
+            },
+
+            // Toggles card selection
+            toggleCardSelection(cardEl) {
+                if (this.isGameOver || this.drawsRemaining === 0) return; // Cannot select cards if game is over or no draws left
+                cardEl.classList.toggle('selected');
+            },
+
+            // Handles card exchange with animations
+            async handleDraw() {
+                if (this.drawsRemaining === 0) {
+                    return; // Abort if no draws left
+                }
+
+                const selectedCards = Array.from(this.playerHandEl.children).filter(cardEl =>
+                    cardEl.classList.contains('selected')
+                );
+
+                if (selectedCards.length === 0) {
+                    showMessageBox(this.texts[this.currentLanguage].selectCardsMessage);
+                    return;
+                }
+
+                if (this.drawButton) this.drawButton.disabled = true; // Disable buttons during animation
+                if (this.standButton) this.standButton.disabled = true;
+                if (this.continueButton) this.continueButton.disabled = true; // Disable continue during animation
+                this.isAnimatingCards = true; // Mark that animation is in progress
+
+                let cardsReplacedCount = 0;
+                const animationDelay = 300; // Matches CSS animation duration
+
+                // Animate out selected cards first
+                const exitPromises = selectedCards.map(cardEl => {
+                    return new Promise(resolve => {
+                        cardEl.classList.add('card-exit');
+                        setTimeout(() => {
+                            cardEl.remove(); // Remove card from DOM after exit animation
+                            resolve();
+                        }, animationDelay);
+                    });
+                });
+
+                await Promise.all(exitPromises); // Wait until all exit animations are complete
+
+                // Play sound when cards are exchanged
+                playCardDealSound();
+
+                // Replace cards and animate in new ones
+                const entryPromises = [];
+                for (const cardEl of selectedCards) {
+                    const indexToReplace = parseInt(cardEl.dataset.index);
+                    const newCard = this.deck.draw();
+
+                    if (newCard) {
+                        this.playerHand[indexToReplace] = newCard;
+                        const newCardEl = this.createCardElement(newCard, indexToReplace);
+                        newCardEl.classList.add('card-enter'); // Add entry animation
+                        
+                        // Find the correct position to insert the new card
+                        const referenceNode = this.playerHandEl.children[indexToReplace];
+                        if (referenceNode) {
+                            this.playerHandEl.insertBefore(newCardEl, referenceNode);
+                        } else {
+                            this.playerHandEl.appendChild(newCardEl);
+                        }
+
+                        entryPromises.push(new Promise(resolve => {
+                            setTimeout(() => {
+                                newCardEl.classList.remove('card-enter');
+                                resolve();
+                            }, animationDelay);
+                        }));
+                        cardsReplacedCount++;
+                    } else {
+                        showMessageBox(this.texts[this.currentLanguage].couldNotDiscardMessage);
+                        this.isGameOver = true; // Game is over if deck is empty
+                        break; // Abort if deck is empty
+                    }
+                }
+
+                await Promise.all(entryPromises); // Wait until all entry animations are complete
+
+                this.isAnimatingCards = false; // Animation complete
+
+                if (cardsReplacedCount > 0) {
+                    this.drawsRemaining--;
+                }
+
+                this.updateUI(); // Update UI after animations and card exchanges
+
+                if (this.drawsRemaining === 0 || this.isGameOver) {
+                    this.endHand(); // End the hand when draws are out or game is over
+                }
+            },
+
+            // Handles player choosing to stand
+            handleStand() {
+                this.endHand(); // End the hand
+            },
+
+            // Ends the current hand
+            endHand() {
+                // Save the score for the current hand
+                const handEvaluation = this.evaluateHand(this.playerHand);
+                this.scores.push(handEvaluation); // Save the entire object
+                this.drawsRemaining = 0; // Set draws left to 0 to activate "Continue Game" button
+                this.updateUI(); // Update UI to show buttons correctly
+                this.renderHighScoreList(); // Update high score list after each hand
+
+                // Check if there are enough cards for the next round
+                if (this.deck.remaining() < 5) {
+                    this.endGame(true); // Game is completely over
+                }
+            },
+
+            // Ends the entire game (when the deck is empty)
+            endGame(deckEmpty = false) {
+                this.isGameOver = true;
+                this.updateUI(); // Update UI to show New Game button and hide others
+
+                let finalMessage = "";
+                let totalScore = this.scores.reduce((sum, hand) => sum + hand.score, 0);
+
+                // Save total score to cookie
+                setCookie('pokerTotalScore', totalScore, 365); // Save for 365 days
+
+                if (deckEmpty) {
+                    finalMessage = this.texts[this.currentLanguage].allDrawsUsedMessage(totalScore);
+                } else {
+                    finalMessage = this.texts[this.currentLanguage].gameOverMessage(totalScore);
+                }
+                showMessageBox(finalMessage);
+                // High score list is already visible and updated
+            },
+
+            // Function to evaluate the poker hand and return name + score
+            evaluateHand(hand) {
+                if (hand.length !== 5) return { name: "Invalid hand", score: 0 };
+
+                const ranks = hand.map(card => card.rank);
+                const suits = hand.map(card => card.suit);
+
+                const rankValues = ranks.map(r => {
+                    if (r === 'J') return 11;
+                    if (r === 'Q') return 12;
+                    if (r === 'K') return 13;
+                    if (r === 'A') return 14;
+                    return parseInt(r);
+                }).sort((a, b) => a - b);
+
+                const rankCounts = {};
+                ranks.forEach(r => { rankCounts[r] = (rankCounts[r] || 0) + 1; });
+                const suitCounts = {};
+                suits.forEach(s => { suitCounts[s] = (suitCounts[s] || 0) + 1; });
+
+                const numPairs = Object.values(rankCounts).filter(count => count === 2).length;
+                const numThrees = Object.values(rankCounts).filter(count => count === 3).length;
+                const numFours = Object.values(rankCounts).filter(count => count === 4).length;
+                const isFlush = Object.values(suitCounts).some(count => count >= 5);
+
+                let isStraight = true;
+                // Handle Ace as low for straight (A, 2, 3, 4, 5)
+                const lowAceRankValues = rankValues.includes(14) ? [...rankValues.filter(r => r !== 14), 1].sort((a, b) => a - b) : rankValues;
+
+                for (let i = 0; i < lowAceRankValues.length - 1; i++) {
+                    if (lowAceRankValues[i + 1] !== lowAceRankValues[i] + 1) {
+                        isStraight = false;
+                        break;
+                    }
+                }
+                // If not a low ace straight, try normal straight
+                if (!isStraight) {
+                    isStraight = true;
+                    for (let i = 0; i < rankValues.length - 1; i++) {
+                        if (rankValues[i + 1] !== rankValues[i] + 1) {
+                            isStraight = false;
+                            break;
+                        }
+                        // Special case for Ace as highest card in straight (10, J, Q, K, A)
+                        if (rankValues[i] === 10 && rankValues[i+1] === 11 && rankValues[i+2] === 12 && rankValues[i+3] === 13 && rankValues[i+4] === 14) {
+                            isStraight = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Evaluate hand in descending order of strength
+                if (isStraight && isFlush && (rankValues[4] === 14 && rankValues[0] === 10)) return { name: "Royal Straight Flush!", score: 10 };
+                if (isStraight && isFlush) return { name: "Straight Flush", score: 9 };
+                if (numFours === 1) return { name: "Four of a Kind", score: 8 };
+                if (numThrees === 1 && numPairs === 1) return { name: "Full House", score: 7 };
+                if (isFlush) return { name: "Flush", score: 6 };
+                if (isStraight) return { name: "Straight", score: 5 };
+                if (numThrees === 1) return { name: "Three of a Kind", score: 4 };
+                if (numPairs === 2) return { name: "Two Pair", score: 3 };
+                if (numPairs === 1) return { name: "One Pair", score: 2 };
+
+                const highestRank = ranks[rankValues.length - 1];
+                return { name: `High Card: ${highestRank}`, score: 1 };
+            },
+
+            // Renders the high score list
+            renderHighScoreList() {
+                if (this.scoreListItemsEl) { // Add check for scoreListItemsEl
+                    this.scoreListItemsEl.innerHTML = ''; // Clear existing list items
+                    let totalScore = 0;
+                    // Iterate in reverse to show latest result at the top
+                    for (let i = this.scores.length - 1; i >= 0; i--) {
+                        const handResult = this.scores[i];
+                        const listItem = document.createElement('li');
+                        // Use original index for display (Hand 1, Hand 2, etc.)
+                        listItem.innerHTML = `<span>${this.texts[this.currentLanguage].handLabel} ${i + 1}: ${handResult.name}</span> <span>${this.texts[this.currentLanguage].pointsLabel} ${handResult.score}</span>`;
+                        this.scoreListItemsEl.appendChild(listItem);
+                        totalScore += handResult.score;
+                    }
+                    if (this.totalScoreEl) { // Add check for totalScoreEl
+                        this.totalScoreEl.textContent = `${this.texts[this.currentLanguage].totalScore} ${totalScore}`;
+                    }
+                }
+                // Update saved total score display
+                if (this.savedTotalScoreDisplayEl) { // Changed from savedTotalScoreEl to savedTotalScoreDisplayEl
+                    const savedScore = getCookie('pokerTotalScore');
+                    this.savedTotalScoreDisplayEl.textContent = savedScore ? `(${savedScore}p)` : '';
+                }
+            },
+
+            // Toggles sound on/off
+            toggleSound() {
+                this.isSoundEnabled = !this.isSoundEnabled;
+                if (this.toggleSoundButton) { // Add check for toggleSoundButton
+                    this.toggleSoundButton.textContent = this.isSoundEnabled ? this.texts[this.currentLanguage].soundOn : this.texts[this.currentLanguage].soundOff;
+                }
+            }
+        };
+
+        // Event listeners for buttons
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize Tone.js audio context on first user interaction
+            let audioContextStarted = false;
+            const startAudioContext = async () => {
+                if (!audioContextStarted) {
+                    try {
+                        await Tone.start();
+                        console.log("Audio context started successfully from initial click listener.");
+                        audioContextStarted = true;
+                    } catch (e) {
+                        console.error("Error starting audio context from initial click listener:", e);
+                    }
+                }
+            };
+
+            // Call initializeDOMElements at the very beginning of DOMContentLoaded
+            game.initializeDOMElements();
+
+            // Attach startAudioContext to any button click, but only run once
+            document.body.addEventListener('click', (event) => {
+                if (event.target.tagName === 'BUTTON') {
+                    startAudioContext();
+                }
+            }, { once: true });
+
+            if (game.drawButton) game.drawButton.addEventListener('click', () => game.handleDraw());
+            if (game.standButton) game.standButton.addEventListener('click', () => game.handleStand());
+            if (game.continueButton) game.continueButton.addEventListener('click', () => game.dealNewRound());
+            if (game.newGameButton) game.newGameButton.addEventListener('click', () => game.startGame());
+            if (game.toggleSoundButton) game.toggleSoundButton.addEventListener('click', () => game.toggleSound()); // Event listener for sound button
+            if (game.helpButton) game.helpButton.addEventListener('click', () => { // Event listener for help button
+                showMessageBox(game.texts[game.currentLanguage].helpDescription);
+                // Close menu after showing help
+                const sideMenu = document.getElementById('side-menu');
+                const overlay = document.getElementById('overlay');
+                if (sideMenu) sideMenu.classList.remove('open');
+                if (overlay) overlay.classList.remove('active');
+            });
+
+            // Hamburger menu logic
+            const hamburgerButton = document.getElementById('hamburger-button');
+            const sideMenu = document.getElementById('side-menu');
+            const closeMenuButton = document.getElementById('close-menu-button');
+            const overlay = document.getElementById('overlay');
+
+            if (hamburgerButton) {
+                hamburgerButton.addEventListener('click', () => {
+                    if (sideMenu) sideMenu.classList.add('open');
+                    if (overlay) overlay.classList.add('active');
+                    game.showMainMenu(); // Show main menu options when opening hamburger
+                });
+            }
+
+            if (closeMenuButton) {
+                closeMenuButton.addEventListener('click', () => {
+                    if (sideMenu) sideMenu.classList.remove('open');
+                    if (overlay) overlay.classList.remove('active');
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    if (sideMenu) sideMenu.classList.remove('open');
+                    if (overlay) overlay.classList.remove('active');
+                });
+            }
+
+            // Language menu navigation
+            if (game.langMenuButton) {
+                game.langMenuButton.addEventListener('click', () => {
+                    game.showLanguageOptions();
+                });
+            }
+            if (game.backButton) {
+                game.backButton.addEventListener('click', () => {
+                    game.showMainMenu();
+                });
+            }
+
+            // Language selection listeners
+            if (game.langSvButton) {
+                game.langSvButton.addEventListener('click', () => {
+                    game.setLanguage('sv');
+                    if (sideMenu) sideMenu.classList.remove('open'); // Close menu after selection
+                    if (overlay) overlay.classList.remove('active');
+                });
+            }
+            if (game.langEnButton) {
+                game.langEnButton.addEventListener('click', () => {
+                    game.setLanguage('en');
+                    if (sideMenu) sideMenu.classList.remove('open'); // Close menu after selection
+                    if (overlay) overlay.classList.remove('active');
+                });
+            }
+
+            // Start the game when the page loads
+            game.startGame();
+        });
+    </script>
+</body>
+</html>
