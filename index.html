@@ -89,7 +89,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             cursor: pointer;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            color: #2d3748; /* Fallback: Dark text for cards */
+            color: #2d3748 !important; /* Force dark text color for card content */
             position: relative;
             user-select: none;
         }
@@ -99,7 +99,7 @@
             border: 3px solid #63b3ed;
         }
         .card.red {
-            color: #e53e3e;
+            color: #e53e3e !important; /* Force red color for hearts and diamonds */
         }
         .card-rank {
             font-size: 2.2rem;
@@ -709,7 +709,7 @@
                 gameTitle: "♠️ Single Player Poker", // Updated title
                 drawsLeft: "Drag kvar:",
                 bestHand: "Bästa hand:",
-                discardButton: "� Byt valda kort",
+                discardButton: "🔄 Byt valda kort",
                 standButton: "✋ Stanna",
                 continueButton: "▶️ Fortsätt Spel",
                 newGameButton: "✨ Nytt Spel",
@@ -841,6 +841,7 @@
                 // this.languageOptionsEl = document.getElementById('language-options');
                 // this.langMenuButton = document.getElementById('lang-menu-button');
                 // this.backButton = document.getElementById('back-button');
+                this.playerHandEl = document.getElementById('player-hand'); // Ensure playerHandEl is initialized here
             },
 
             // Helper function to create a card DOM element
@@ -915,9 +916,9 @@
                 // Update language toggle button
                 if (this.languageToggleButton) {
                     if (lang === 'en') {
-                        this.languageToggleButton.innerHTML = `${t.langToggleSv} <img src="https://placehold.co/20x15/fff/000?text=SE" alt="Swedish Flag" class="flag-icon">`;
+                        this.languageToggleButton.innerHTML = `${this.texts['sv'].langToggleSv} <img src="https://placehold.co/20x15/fff/000?text=SE" alt="Swedish Flag" class="flag-icon">`; // Show Swedish flag to switch to Swedish
                     } else {
-                        this.languageToggleButton.innerHTML = `${t.langToggleEn} <img src="https://placehold.co/20x15/fff/000?text=US" alt="US Flag" class="flag-icon">`;
+                        this.languageToggleButton.innerHTML = `${this.texts['en'].langToggleEn} <img src="https://placehold.co/20x15/fff/000?text=US" alt="US Flag" class="flag-icon">`; // Show US flag to switch to English
                     }
                 }
 
@@ -944,12 +945,6 @@
                     if (this.highScoreTitleTextEl) this.highScoreTitleTextEl.textContent = t.highScoreTitle;
                 }
 
-                // No longer needed for offcanvas menu title/buttons
-                // if (this.menuTitleEl) this.menuTitleEl.textContent = t.menuTitle;
-                // if (this.langSvButton) this.langSvButton.textContent = `${t.langSwedish} 🇸🇪`;
-                // if (this.langEnButton) this.langEnButton.textContent = `${t.langEnglish} 🇬🇧`;
-                // if (this.backButton) this.backButton.textContent = `⬅️ ${t.backButton}`;
-
                 // Update saved total score display
                 if (this.savedTotalScoreDisplayEl) {
                     const savedScore = getCookie('pokerTotalScore');
@@ -959,7 +954,7 @@
                     this.savedTotalScoreDisplayEl = document.getElementById('saved-total-score-display');
                     if (this.savedTotalScoreDisplayEl) {
                         const savedScore = getCookie('pokerTotalScore');
-                        this.savedTotalScoreDisplayel.textContent = savedScore ? `(${savedScore}p)` : '';
+                        this.savedTotalScoreDisplayEl.textContent = savedScore ? `(${savedScore}p)` : '';
                     }
                 }
 
