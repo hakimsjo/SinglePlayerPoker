@@ -22,8 +22,8 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        .game-wrapper {
-            position: relative;
+        .game-wrapper { /* New wrapper to handle main layout */
+            position: relative; /* For positioning hamburger button */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -78,7 +78,7 @@
         .card {
             width: 100px;
             height: 140px;
-            background-color: #fff;
+            background-color: #fff; /* Fallback: White background */
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -89,7 +89,7 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             cursor: pointer;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            color: #2d3748;
+            color: #2d3748; /* Fallback: Dark text for cards */
             position: relative;
             user-select: none;
         }
