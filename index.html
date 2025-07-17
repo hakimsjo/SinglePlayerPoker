@@ -712,7 +712,7 @@
                 gameTitle: "♠️ Single Player Poker", // Updated title
                 drawsLeft: "Drag kvar:",
                 bestHand: "Bästa hand:",
-                discardButton: "� Byt valda kort",
+                discardButton: "🔄 Byt valda kort",
                 standButton: "✋ Stanna",
                 continueButton: "▶️ Fortsätt Spel",
                 newGameButton: "✨ Nytt Spel",
@@ -1195,7 +1195,7 @@
                 // High score list is already visible and updated
             },
 
-            // Function to evaluate the poker hand and return name + score
+            // Function for evaluating the poker hand and returning name + score
             evaluateHand(hand) {
                 if (hand.length !== 5) return { name: "Invalid hand", score: 0 };
 
