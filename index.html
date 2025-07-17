@@ -9,6 +9,8 @@
     <!-- Tailwind CSS CDN for easy styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Tone.js for sound generation (moved to head with defer) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js" crossorigin="anonymous" defer></script>
     
     <style>
         body {
@@ -628,22 +630,22 @@
         async function playCardDealSound() {
             if (game.isSoundEnabled) {
                 // Ensure audio context is running and synth is initialized
-                if (Tone.context.state !== 'running' || !cardDealSynth) {
+                if (Tone.context.state !== 'running') {
                     try {
                         await Tone.start();
                         console.log("Audio context started successfully from playCardDealSound.");
-                        // Initialize synth only once after context is running
-                        if (!cardDealSynth) {
-                            cardDealSynth = new Tone.NoiseSynth({
-                                noise: { type: "white" },
-                                envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.15 },
-                                filter: { type: "bandpass", frequency: 1500, Q: 0.8 }
-                            }).toDestination();
-                        }
                     } catch (e) {
                         console.error("Error starting audio context from playCardDealSound:", e);
                         return; // Abort if context could not be started
                     }
+                }
+                // Initialize synth only once after context is running
+                if (!cardDealSynth) {
+                    cardDealSynth = new Tone.NoiseSynth({
+                        noise: { type: "white" },
+                        envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.15 },
+                        filter: { type: "bandpass", frequency: 1500, Q: 0.8 }
+                    }).toDestination();
                 }
 
                 const now = Tone.now();
