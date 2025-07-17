@@ -68,12 +68,22 @@
             align-items: flex-start;
             gap: 4px;
         }
-        .player-hand {
+        .player-hand-and-deck { /* New container for player hand and deck */
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            align-items: center; /* Align items vertically in the center */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            gap: 16px; /* Space between cards and deck */
             margin-bottom: 32px;
+            width: 100%; /* Take full width to manage internal layout */
+        }
+        .player-hand { /* Ensure cards are displayed in a row */
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
+            gap: 16px; /* Space between cards */
+            /* Removed margin-bottom as it's now handled by player-hand-and-deck gap */
+            flex-grow: 1; /* Allow player hand to take available space */
         }
         .card {
             width: 100px;
@@ -315,10 +325,15 @@
                 flex-direction: column;
                 align-items: center;
             }
+            .player-hand-and-deck { /* Stack vertically on small screens */
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
             .player-hand {
                 flex-wrap: wrap;
                 justify-content: center;
-                margin-bottom: 20px;
+                margin-bottom: 0; /* No extra margin when stacked */
             }
             .card {
                 width: 80px;
@@ -368,16 +383,14 @@
 <body class="d-flex justify-content-center align-items-center min-vh-100 bg-gray-900 text-gray-100 p-3">
 
     <div class="game-wrapper">
-        <!-- Hamburger Button (Removed from here, as it's no longer needed for offcanvas) -->
-        <!-- Side Menu (Offcanvas) -->
+        <!-- Side Menu (Offcanvas - still included for Bootstrap's JS, but not used as a visible menu) -->
         <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
             <div class="offcanvas-header">
                 <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body d-flex flex-column gap-3">
-                <!-- Main menu options (now directly in body, no longer hidden) -->
-                <!-- Language options (now directly in body, no longer hidden) -->
+                <!-- No menu items here, as they are now direct buttons -->
             </div>
         </div>
 
@@ -398,6 +411,13 @@
                     </ul>
                     <div id="total-score" class="text-xl font-bold text-green-300 text-center mt-3 pt-2 border-top border-secondary">Total Score: 0</div>
                 </div>
+            </div>
+
+            <!-- Player hand and Deck on the same row -->
+            <div class="player-hand-and-deck d-flex justify-content-center align-items-center flex-wrap gap-3 mb-4">
+                <div id="player-hand" class="player-hand d-flex justify-content-center flex-wrap gap-3">
+                    <!-- Cards will be loaded here with JavaScript -->
+                </div>
                 <div class="deck-area d-flex flex-column align-items-end gap-1 flex-shrink-0">
                     <div id="deck" class="deck-card flex-shrink-0">
                         <span class="text-5xl">🃏</span>
@@ -406,9 +426,6 @@
                 </div>
             </div>
 
-            <div id="player-hand" class="player-hand d-flex justify-content-center flex-wrap gap-3 mb-4">
-                <!-- Cards will be loaded here with JavaScript -->
-            </div>
 
             <div class="controls d-flex flex-column flex-md-row gap-3 w-100 justify-content-center">
                 <button id="draw-button" class="game-button btn btn-primary">🔄 Discard selected cards</button>
@@ -712,7 +729,7 @@
                 gameTitle: "♠️ Single Player Poker", // Updated title
                 drawsLeft: "Drag kvar:",
                 bestHand: "Bästa hand:",
-                discardButton: "🔄 Byt valda kort",
+                discardButton: "� Byt valda kort",
                 standButton: "✋ Stanna",
                 continueButton: "▶️ Fortsätt Spel",
                 newGameButton: "✨ Nytt Spel",
