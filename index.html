@@ -10,6 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
+    <!-- Bootstrap Bundle with Popper (moved to head with defer) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous" defer></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -139,7 +142,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 3rem;
+            /* Adjust font-size for the joker emoji to fill the card */
+            font-size: 8rem; /* Increased size significantly */
+            line-height: 1; /* Adjust line-height to prevent extra space */
             color: #cbd5e0;
         }
         /* Custom button styling to override Bootstrap defaults */
@@ -519,9 +524,7 @@
 
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <!-- Tone.js for sound generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js" crossorigin="anonymous"></script>
-
+    
     <script>
         // Cookie functions
         function setCookie(name, value, days) {
@@ -637,44 +640,88 @@
             }
         }
 
-        // Tone.js synth for card dealing sound
-        let cardDealSynth; // Declare globally but initialize in startAudioContext
-
+        // Web Audio API for card dealing sound
+        let audioContext = null; // Global AudioContext instance
         let lastCardDealSoundTime = 0;
-        const cardDealSoundCooldown = 0.3; // Increased cooldown to 300ms to match longer sound
+        const cardDealSoundCooldown = 0.3; // 300ms cooldown
 
-        // Function to play card dealing sound
+        // Function to play card dealing sound using Web Audio API
         async function playCardDealSound() {
-            if (game.isSoundEnabled) {
-                // Ensure audio context is running and synth is initialized
-                if (Tone.context.state !== 'running') {
-                    try {
-                        await Tone.start();
-                        console.log("Audio context started successfully from playCardDealSound.");
-                    } catch (e) {
-                        console.error("Error starting audio context from playCardDealSound:", e);
-                        return; // Abort if context could not be started
-                    }
+            if (!game.isSoundEnabled) {
+                console.log("Sound is disabled.");
+                return;
+            }
+
+            // Lazy initialization of AudioContext
+            if (!audioContext) {
+                window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!window.AudioContext) {
+                    console.error("Web Audio API is not supported in this browser.");
+                    return;
                 }
-                // Initialize synth only once after context is running
-                if (!cardDealSynth) {
-                    cardDealSynth = new Tone.NoiseSynth({
-                        noise: { type: "white" },
-                        envelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.15 },
-                        filter: { type: "bandpass", frequency: 1500, Q: 0.8 }
-                    }).toDestination();
+                audioContext = new AudioContext();
+                console.log("AudioContext created.");
+            }
+
+            // Resume context if suspended (required by most browsers for autoplay)
+            if (audioContext.state === 'suspended') {
+                try {
+                    await audioContext.resume();
+                    console.log("Audio context resumed successfully.");
+                } catch (e) {
+                    console.error("Error resuming audio context:", e);
+                    return;
+                }
+            }
+
+            const now = audioContext.currentTime;
+            if (now - lastCardDealSoundTime > cardDealSoundCooldown) {
+                console.log("Playing card deal sound at:", now);
+
+                try {
+                    const duration = 0.5; // Total duration of the shaking sound
+                    const numClicks = 8; // Number of individual "clicks"
+                    const clickDuration = 0.05; // Duration of each click
+
+                    for (let i = 0; i < numClicks; i++) {
+                        const startTime = audioContext.currentTime + (i * (duration / numClicks));
+
+                        // Create a short burst of white noise for the "click"
+                        const bufferSize = audioContext.sampleRate * clickDuration;
+                        const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+                        const output = noiseBuffer.getChannelData(0);
+                        for (let j = 0; j < bufferSize; j++) {
+                            output[j] = Math.random() * 0.8 - 0.4; // Slightly lower amplitude noise
+                        }
+
+                        const noiseSource = audioContext.createBufferSource();
+                        noiseSource.buffer = noiseBuffer;
+
+                        const gainNode = audioContext.createGain();
+                        gainNode.gain.setValueAtTime(0, startTime);
+                        gainNode.gain.linearRampToValueAtTime(0.4 + Math.random() * 0.2, startTime + 0.01); // Quick attack with slight randomness
+                        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + clickDuration); // Fast decay
+
+                        // Add a bandpass filter for a "scratchier" sound
+                        const filter = audioContext.createBiquadFilter();
+                        filter.type = 'bandpass';
+                        filter.frequency.setValueAtTime(1500, startTime);
+                        filter.Q.setValueAtTime(0.8, startTime);
+
+                        noiseSource.connect(filter);
+                        filter.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+
+                        noiseSource.start(startTime);
+                        noiseSource.stop(startTime + clickDuration);
+                    }
+                } catch (e) {
+                    console.error("Failed to generate and play sound:", e);
                 }
 
-                const now = Tone.now();
-                if (now - lastCardDealSoundTime > cardDealSoundCooldown) {
-                    console.log("Playing card deal sound at:", now); // Debugging log
-                    cardDealSynth.triggerAttackRelease("0.2", now); // Increased duration to 0.2 seconds
-                    lastCardDealSoundTime = now;
-                } else {
-                    console.log("Card deal sound skipped due to cooldown."); // Debugging log
-                }
+                lastCardDealSoundTime = now;
             } else {
-                console.log("Card deal sound not played. Enabled:", game.isSoundEnabled, "Context state:", Tone.context.state); // Debugging log
+                console.log("Card deal sound skipped due to cooldown.");
             }
         }
 
@@ -1322,27 +1369,40 @@
 
         // Event listeners for buttons
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Tone.js audio context on first user interaction
-            let audioContextStarted = false;
-            const startAudioContext = async () => {
-                if (!audioContextStarted) {
-                    try {
-                        await Tone.start();
-                        console.log("Audio context started successfully from initial click listener.");
-                        audioContextStarted = true;
-                    } catch (e) {
-                        console.error("Error starting audio context from initial click listener:", e);
+            // Initialize AudioContext on first user interaction
+            let audioContextInitialized = false;
+            const initializeAudioContext = async () => {
+                if (!audioContextInitialized) {
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (!window.AudioContext) {
+                        console.error("Web Audio API is not supported in this browser.");
+                        return;
                     }
+                    if (!audioContext) { // Create context only once
+                        audioContext = new AudioContext();
+                        console.log("AudioContext created.");
+                    }
+                    if (audioContext.state === 'suspended') {
+                        try {
+                            await audioContext.resume();
+                            console.log("Audio context resumed successfully.");
+                        } catch (e) {
+                            console.error("Error resuming audio context:", e);
+                            return;
+                        }
+                    }
+                    audioContextInitialized = true;
+                    console.log("Audio context is now running.");
                 }
             };
 
             // Call initializeDOMElements at the very beginning of DOMContentLoaded
             game.initializeDOMElements();
 
-            // Attach startAudioContext to any button click, but only run once
+            // Attach initializeAudioContext to any button click, but only run once
             document.body.addEventListener('click', (event) => {
                 if (event.target.tagName === 'BUTTON') {
-                    startAudioContext();
+                    initializeAudioContext();
                 }
             }, { once: true });
 
