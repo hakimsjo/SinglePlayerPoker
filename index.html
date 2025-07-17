@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single Player Poker Game</title>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Tailwind CSS CDN for easy styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -313,39 +315,22 @@
             fill: #e2e8f0; /* White color */
         }
 
-        #side-menu {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            height: 100%;
-            background-color: #2d3748;
-            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            transform: translateX(-100%); /* Hidden by default */
-            transition: transform 0.3s ease-in-out;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+        /* Override Bootstrap's offcanvas default background and text color */
+        .offcanvas {
+            background-color: #2d3748 !important; /* Darker gray background */
+            color: #e2e8f0 !important; /* Light text */
         }
-        #side-menu.open {
-            transform: translateX(0); /* Visible when open */
+        .offcanvas-header {
+            border-bottom: 1px solid #4a5568; /* Subtle border */
         }
-        #side-menu .close-button {
-            align-self: flex-end;
-            background-color: transparent;
-            border: none;
-            color: #e2e8f0;
-            font-size: 1.8rem;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 5px;
-            transition: background-color 0.2s;
+        .offcanvas-title {
+            color: #63b3ed !important; /* Blue title */
+            font-weight: 700;
         }
-        #side-menu .close-button:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+        .btn-close {
+            filter: invert(1) grayscale(1) brightness(2); /* Make close button white */
         }
+
         .menu-item { /* Unified style for menu items */
             width: 100%;
             padding: 12px 15px;
@@ -360,6 +345,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            border: none; /* Ensure no default button borders */
         }
         .menu-item:hover {
             background-color: #3182ce;
@@ -368,22 +354,8 @@
             display: none !important;
         }
 
-        #overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            display: none; /* Hidden by default */
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        #overlay.active {
-            display: block;
-            opacity: 1;
-        }
+        /* No need for custom overlay as Bootstrap handles backdrop */
+        /* #overlay { ... } */
 
 
         /* Responsive adjustments */
@@ -450,34 +422,34 @@
 
     <div class="game-wrapper">
         <!-- Hamburger Button -->
-        <button id="hamburger-button">
-            <svg viewBox="0 0 100 80" width="40" height="40">
-                <rect width="100" height="15" rx="8"></rect>
-                <rect y="30" width="100" height="15" rx="8"></rect>
-                <rect y="60" width="100" height="15" rx="8"></rect>
+        <button id="hamburger-button" class="btn btn-dark p-2 rounded-lg" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
+            <svg viewBox="0 0 100 80" width="30" height="30">
+                <rect width="100" height="15" rx="8" fill="#e2e8f0"></rect>
+                <rect y="30" width="100" height="15" rx="8" fill="#e2e8f0"></rect>
+                <rect y="60" width="100" height="15" rx="8" fill="#e2e8f0"></rect>
             </svg>
         </button>
 
-        <!-- Side Menu -->
-        <div id="side-menu">
-            <button class="close-button" id="close-menu-button">&times;</button>
-            <div class="text-2xl font-bold text-blue-400 mb-4" id="menu-title">Menu</div>
-
-            <div id="main-menu-options">
-                <button id="toggle-sound-button" class="menu-item">🔊 Sound On</button>
-                <button id="help-button" class="menu-item">❓ Help</button>
-                <button id="lang-menu-button" class="menu-item">🌐 Language</button>
+        <!-- Side Menu (Offcanvas) -->
+        <div class="offcanvas offcanvas-start text-bg-dark" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
+            <div class="offcanvas-body d-flex flex-column gap-3">
+                <div id="main-menu-options" class="d-flex flex-column gap-3">
+                    <button id="toggle-sound-button" class="menu-item">🔊 Sound On</button>
+                    <button id="help-button" class="menu-item">❓ Help</button>
+                    <button id="lang-menu-button" class="menu-item">🌐 Language</button>
+                </div>
 
-            <div id="language-options" class="menu-section-hidden">
-                <button id="back-button" class="menu-item">⬅️ Back</button>
-                <button id="lang-sv-button" class="menu-item">Svenska 🇸🇪</button>
-                <button id="lang-en-button" class="menu-item">English 🇬🇧</button>
+                <div id="language-options" class="d-flex flex-column gap-3 menu-section-hidden">
+                    <button id="back-button" class="menu-item">⬅️ Back</button>
+                    <button id="lang-sv-button" class="menu-item">Svenska 🇸🇪</button>
+                    <button id="lang-en-button" class="menu-item">English 🇬🇧</button>
+                </div>
             </div>
         </div>
-
-        <!-- Overlay for closing menu -->
-        <div id="overlay"></div>
 
         <div class="game-container">
             <div class="header-area">
@@ -522,6 +494,9 @@
         <p id="message-text" class="text-lg font-medium"></p>
         <button id="message-ok-button">OK</button>
     </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
     <script>
         // Cookie functions
@@ -746,7 +721,8 @@
                     
                     Good luck!
                 `,
-                langMenuTitle: "🌐 Language" // New text for language menu title
+                langMenuTitle: "🌐 Language", // New text for language menu title
+                backButton: "Back" // Text for back button
             },
             sv: {
                 gameTitle: "♠️ Single Player Poker", // Updated title
@@ -802,7 +778,8 @@
                     
                     Lycka till!
                 `,
-                langMenuTitle: "🌐 Språk" // New text for language menu title
+                langMenuTitle: "🌐 Språk", // New text for language menu title
+                backButton: "Tillbaka" // Text for back button
             }
         };
 
@@ -870,7 +847,7 @@
 
                 this.scoreListItemsEl = document.getElementById('score-list-items');
                 this.totalScoreEl = document.getElementById('total-score');
-                this.menuTitleEl = document.getElementById('menu-title');
+                this.menuTitleEl = document.getElementById('offcanvasMenuLabel'); // Bootstrap offcanvas title
                 this.langSvButton = document.getElementById('lang-sv-button');
                 this.langEnButton = document.getElementById('lang-en-button');
                 this.playerHandEl = document.getElementById('player-hand');
@@ -975,10 +952,10 @@
                     if (this.highScoreTitleTextEl) this.highScoreTitleTextEl.textContent = t.highScoreTitle;
                 }
 
-                if (this.menuTitleEl) this.menuTitleEl.textContent = t.menuTitle;
+                if (this.menuTitleEl) this.menuTitleEl.textContent = t.menuTitle; // Update offcanvas title
                 if (this.langSvButton) this.langSvButton.textContent = `${t.langSwedish} 🇸🇪`;
                 if (this.langEnButton) this.langEnButton.textContent = `${t.langEnglish} 🇬🇧`;
-                if (this.backButton) this.backButton.textContent = `⬅️ ${t.backButton}`; // Assuming 'Back' is a common concept
+                if (this.backButton) this.backButton.textContent = `⬅️ ${t.backButton}`;
 
                 // Update saved total score display
                 if (this.savedTotalScoreDisplayEl) {
@@ -1002,14 +979,14 @@
             showMainMenu() {
                 if (this.mainMenuOptionsEl) this.mainMenuOptionsEl.classList.remove('menu-section-hidden');
                 if (this.languageOptionsEl) this.languageOptionsEl.classList.add('menu-section-hidden');
-                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].menuTitle; // Set menu title
+                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].menuTitle; // Set offcanvas title
             },
 
             // Shows the language selection options
             showLanguageOptions() {
                 if (this.mainMenuOptionsEl) this.mainMenuOptionsEl.classList.add('menu-section-hidden');
                 if (this.languageOptionsEl) this.languageOptionsEl.classList.remove('menu-section-hidden');
-                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].langMenuTitle; // Set menu title to Language/Språk
+                if (this.menuTitleEl) this.menuTitleEl.textContent = this.texts[this.currentLanguage].langMenuTitle; // Set offcanvas title to Language/Språk
             },
 
             // Starts a new game
@@ -1040,7 +1017,7 @@
                 if (this.standButton) this.standButton.classList.remove('hidden');
                 if (this.newGameButton) this.newGameButton.classList.add('hidden');
                 
-                // Fortsätt-knappen är alltid synlig men inaktiveras vid ny runda
+                // Continue button is always visible but disabled at start of new round
                 if (this.continueButton) this.continueButton.disabled = true; 
 
                 if (this.drawButton) this.drawButton.disabled = false;
@@ -1364,37 +1341,25 @@
             if (game.helpButton) game.helpButton.addEventListener('click', () => { // Event listener for help button
                 showMessageBox(game.texts[game.currentLanguage].helpDescription);
                 // Close menu after showing help
-                const sideMenu = document.getElementById('side-menu');
-                const overlay = document.getElementById('overlay');
-                if (sideMenu) sideMenu.classList.remove('open');
-                if (overlay) overlay.classList.remove('active');
+                const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+                if (offcanvasMenu) offcanvasMenu.hide();
             });
 
             // Hamburger menu logic
             const hamburgerButton = document.getElementById('hamburger-button');
-            const sideMenu = document.getElementById('side-menu');
-            const closeMenuButton = document.getElementById('close-menu-button');
-            const overlay = document.getElementById('overlay');
+            const offcanvasMenuEl = document.getElementById('offcanvasMenu'); // Get the offcanvas element
+            const closeMenuButton = offcanvasMenuEl ? offcanvasMenuEl.querySelector('.btn-close') : null; // Get Bootstrap's close button
 
             if (hamburgerButton) {
                 hamburgerButton.addEventListener('click', () => {
-                    if (sideMenu) sideMenu.classList.add('open');
-                    if (overlay) overlay.classList.add('active');
+                    // Bootstrap handles showing the offcanvas
                     game.showMainMenu(); // Show main menu options when opening hamburger
                 });
             }
 
             if (closeMenuButton) {
                 closeMenuButton.addEventListener('click', () => {
-                    if (sideMenu) sideMenu.classList.remove('open');
-                    if (overlay) overlay.classList.remove('active');
-                });
-            }
-
-            if (overlay) {
-                overlay.addEventListener('click', () => {
-                    if (sideMenu) sideMenu.classList.remove('open');
-                    if (overlay) overlay.classList.remove('active');
+                    // Bootstrap handles hiding the offcanvas
                 });
             }
 
@@ -1414,15 +1379,17 @@
             if (game.langSvButton) {
                 game.langSvButton.addEventListener('click', () => {
                     game.setLanguage('sv');
-                    if (sideMenu) sideMenu.classList.remove('open'); // Close menu after selection
-                    if (overlay) overlay.classList.remove('active');
+                    // Hide offcanvas after language selection
+                    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+                    if (offcanvasMenu) offcanvasMenu.hide();
                 });
             }
             if (game.langEnButton) {
                 game.langEnButton.addEventListener('click', () => {
                     game.setLanguage('en');
-                    if (sideMenu) sideMenu.classList.remove('open'); // Close menu after selection
-                    if (overlay) overlay.classList.remove('active');
+                    // Hide offcanvas after language selection
+                    const offcanvasMenu = bootstrap.Offcanvas.getInstance(document.getElementById('offcanvasMenu'));
+                    if (offcanvasMenu) offcanvasMenu.hide();
                 });
             }
 
