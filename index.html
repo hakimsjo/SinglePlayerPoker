@@ -6,7 +6,7 @@
     <title>Single Player Poker Game</title>
     <!-- Bootstrap CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <!-- Tailwind CSS CDN for easy styling -->
+    <!-- Tailwind CSS CDN for easy styling (still useful for some utility classes not in Bootstrap) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
@@ -22,8 +22,8 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        .game-wrapper { /* New wrapper to handle main layout */
-            position: relative; /* For positioning hamburger button */
+        .game-wrapper {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -33,52 +33,52 @@
             box-sizing: border-box;
         }
         .game-container {
-            background-color: #2d3748; /* Darker gray background for container */
+            background-color: #2d3748;
             border-radius: 16px;
             padding: 32px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-            width: 100%; /* Fill available width */
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 24px;
         }
-        .header-area { /* New div for title, high score, and deck */
+        .header-area {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start; /* Align to top */
+            align-items: flex-start;
             width: 100%;
-            margin-bottom: 20px; /* More space below title */
-            gap: 20px; /* Spacing between elements */
+            margin-bottom: 20px;
+            gap: 20px;
         }
-        .left-header-content { /* New container for title and game info */
+        .left-header-content {
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* Left-align content */
+            align-items: flex-start;
             flex-shrink: 0;
         }
         .header-area h1 {
-            flex-shrink: 0; /* Prevent title from shrinking */
-            text-align: left; /* Ensure left alignment */
-            margin-bottom: 8px; /* Less margin below title */
+            flex-shrink: 0;
+            text-align: left;
+            margin-bottom: 8px;
         }
-        .game-info { /* Style for "Draws left" and "Best hand" */
+        .game-info {
             display: flex;
             flex-direction: column;
-            align-items: flex-start; /* Left-align text */
-            gap: 4px; /* Less space between lines */
+            align-items: flex-start;
+            gap: 4px;
         }
-        .player-hand { /* Ensure cards are displayed in a row */
+        .player-hand {
             display: flex;
             justify-content: center;
-            flex-wrap: wrap; /* Allow cards to wrap on smaller screens */
-            gap: 16px; /* Space between cards */
-            margin-bottom: 32px; /* Space below cards */
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 32px;
         }
         .card {
             width: 100px;
             height: 140px;
-            background-color: #fff; /* Fallback: White background */
+            background-color: #fff;
             border-radius: 12px;
             display: flex;
             flex-direction: column;
@@ -89,17 +89,17 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             cursor: pointer;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            color: #2d3748; /* Fallback: Dark text for cards */
+            color: #2d3748;
             position: relative;
             user-select: none;
         }
         .card.selected {
             transform: translateY(-15px) scale(1.05);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-            border: 3px solid #63b3ed; /* Blue border for selected cards */
+            border: 3px solid #63b3ed;
         }
         .card.red {
-            color: #e53e3e; /* Red color for hearts and diamonds */
+            color: #e53e3e;
         }
         .card-rank {
             font-size: 2.2rem;
@@ -125,15 +125,15 @@
         .deck-area {
             display: flex;
             flex-direction: column;
-            align-items: flex-end; /* Right-align deck info */
+            align-items: flex-end;
             gap: 4px;
-            text-align: right; /* Text inside right-aligned */
-            flex-shrink: 0; /* Prevent deck from shrinking */
+            text-align: right;
+            flex-shrink: 0;
         }
         .deck-card {
             width: 100px;
             height: 140px;
-            background-color: #4a5568; /* Dark gray for card back */
+            background-color: #4a5568;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: flex;
@@ -142,8 +142,9 @@
             font-size: 3rem;
             color: #cbd5e0;
         }
+        /* Custom button styling to override Bootstrap defaults */
         .game-button {
-            padding: 12px 24px !important; /* Use !important to override Bootstrap */
+            padding: 12px 24px !important;
             border-radius: 10px !important;
             font-weight: 600 !important;
             cursor: pointer !important;
@@ -152,10 +153,10 @@
             border: none !important;
             background: linear-gradient(145deg, #4299e1, #3182ce) !important; /* Blue gradient */
             color: white !important;
-            display: flex !important; /* Use flexbox to center emoji and text */
+            display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            gap: 8px !important; /* Space between emoji and text */
+            gap: 8px !important;
         }
         .game-button:hover {
             background: linear-gradient(145deg, #3182ce, #2c5282) !important;
@@ -172,24 +173,31 @@
             box-shadow: none !important;
             transform: none !important;
         }
-        .message-box {
+        /* Message box styling (now a Bootstrap Modal) */
+        .message-box .modal-content {
             background-color: #2d3748;
-            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            text-align: center;
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            gap: 15px;
-            max-width: 400px;
-            width: 90%;
+            color: #e2e8f0;
         }
-        .message-box button {
+        .message-box .modal-header {
+            border-bottom: none;
+        }
+        .message-box .modal-title {
+            color: #63b3ed;
+            font-weight: 700;
+        }
+        .message-box .btn-close {
+            filter: invert(1) grayscale(1) brightness(2);
+        }
+        .message-box .modal-body {
+            font-size: 1.1rem;
+        }
+        .message-box .modal-footer {
+            border-top: none;
+            justify-content: center;
+        }
+        .message-box .modal-footer .btn {
             background-color: #4299e1;
             color: white;
             padding: 10px 20px;
@@ -198,7 +206,7 @@
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        .message-box button:hover {
+        .message-box .modal-footer .btn:hover {
             background-color: #3182ce;
         }
 
@@ -238,19 +246,19 @@
         /* High Score List Styling */
         #high-score-list {
             background-color: #1a202c;
-            padding: 10px; /* Adjusted padding to fit better in the middle */
+            padding: 10px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            flex-grow: 1; /* Allow it to take available space */
-            max-width: 300px; /* Limit max width for symmetry */
-            max-height: 180px; /* Make it scrollable */
-            overflow-y: auto; /* Enable vertical scrolling */
+            flex-grow: 1;
+            max-width: 300px;
+            max-height: 180px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
         #high-score-list h2 {
-            font-size: 1.4rem; /* Smaller heading to fit better */
+            font-size: 1.4rem;
             font-weight: 700;
             color: #63b3ed;
             text-align: center;
@@ -259,19 +267,19 @@
         #high-score-list ul {
             list-style: none;
             padding: 0;
-            flex-grow: 1; /* Allow the list to grow within its container */
-            overflow-y: auto; /* Ensure the list is scrollable inside */
-            padding-right: 5px; /* Make space for the scrollbar */
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 5px;
         }
         #high-score-list li {
             background-color: #2d3748;
-            padding: 6px 10px; /* Made rows smaller */
-            border-radius: 6px; /* Less rounded corners */
-            margin-bottom: 4px; /* Less margin */
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-bottom: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.95rem; /* Smaller text size */
+            font-size: 0.95rem;
         }
         #high-score-list li:last-child {
             margin-bottom: 0;
@@ -284,19 +292,19 @@
             color: #90cdf4;
         }
         #total-score {
-            font-size: 1.2rem; /* Smaller total score text */
+            font-size: 1.2rem;
             font-weight: 700;
-            color: #a7f3d0; /* Light green for total score */
+            color: #a7f3d0;
             text-align: center;
-            margin-top: 10px; /* Less top margin */
-            padding-top: 8px; /* Less padding */
+            margin-top: 10px;
+            padding-top: 8px;
             border-top: 1px solid #4a5568;
         }
-        #saved-total-score-display { /* Style for saved total score */
-            font-size: 1rem; /* Adjust font size to fit in h2 */
+        #saved-total-score-display {
+            font-size: 1rem;
             font-weight: 600;
             color: #cbd5e0;
-            margin-left: 8px; /* Space from the main title text */
+            margin-left: 8px;
         }
 
         /* Hamburger Menu Styles */
@@ -304,7 +312,7 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            z-index: 1001; /* Above side menu */
+            z-index: 1050; /* Higher than Bootstrap's offcanvas backdrop (1040) */
             background-color: transparent;
             border: none;
             cursor: pointer;
@@ -318,23 +326,23 @@
         #hamburger-button svg {
             width: 30px;
             height: 30px;
-            fill: #e2e8f0; /* White color */
+            fill: #e2e8f0;
         }
 
         /* Override Bootstrap's offcanvas default background and text color */
         .offcanvas {
-            background-color: #2d3748 !important; /* Darker gray background */
-            color: #e2e8f0 !important; /* Light text */
+            background-color: #2d3748 !important;
+            color: #e2e8f0 !important;
         }
         .offcanvas-header {
-            border-bottom: 1px solid #4a5568; /* Subtle border */
+            border-bottom: 1px solid #4a5568;
         }
         .offcanvas-title {
-            color: #63b3ed !important; /* Blue title */
+            color: #63b3ed !important;
             font-weight: 700;
         }
         .btn-close {
-            filter: invert(1) grayscale(1) brightness(2); /* Make close button white */
+            filter: invert(1) grayscale(1) brightness(2);
         }
 
         .menu-item { /* Unified style for menu items */
@@ -351,7 +359,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            border: none; /* Ensure no default button borders */
+            border: none;
         }
         .menu-item:hover {
             background-color: #3182ce;
@@ -359,10 +367,6 @@
         .menu-section-hidden {
             display: none !important;
         }
-
-        /* No need for custom overlay as Bootstrap handles backdrop */
-        /* #overlay { ... } */
-
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -398,23 +402,23 @@
                 gap: 15px;
             }
             .header-area h1 {
-                text-align: center; /* Center title on small screens */
+                text-align: center;
             }
             .left-header-content {
-                align-items: center; /* Center content on small screens */
-                order: 1; /* Title and info first */
+                align-items: center;
+                order: 1;
             }
             .game-info {
-                align-items: center; /* Center text on small screens */
+                align-items: center;
             }
             #high-score-list {
-                max-width: 90%; /* Adjust width for small screens */
-                max-height: 150px; /* Adjust height for small screens */
-                order: 3; /* Place it below title and deck on small screens for better flow */
+                max-width: 90%;
+                max-height: 150px;
+                order: 3;
             }
             .deck-area {
-                order: 2; /* Place deck below title but before high score on small screens */
-                align-items: center; /* Center deck info on small screens */
+                order: 2;
+                align-items: center;
                 text-align: center;
             }
             #hamburger-button {
@@ -424,7 +428,7 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-height-screen bg-gray-900 text-gray-100 p-5">
+<body class="d-flex justify-content-center align-items-center min-vh-100 bg-gray-900 text-gray-100 p-3">
 
     <div class="game-wrapper">
         <!-- Hamburger Button -->
@@ -457,24 +461,24 @@
             </div>
         </div>
 
-        <div class="game-container">
-            <div class="header-area">
-                <div class="left-header-content">
+        <div class="game-container container p-4 rounded-3 shadow-lg">
+            <div class="header-area d-flex justify-content-between align-items-start w-100 mb-4">
+                <div class="left-header-content d-flex flex-column align-items-start flex-shrink-0">
                     <h1 class="text-4xl font-bold text-blue-400" id="game-title">♠️ Single Player Poker</h1>
-                    <div class="game-info">
+                    <div class="game-info d-flex flex-column align-items-start gap-1">
                         <div class="text-xl font-semibold" id="draw-count-label">Draws left: <span id="draw-count" class="text-blue-300">3</span></div>
                         <div class="text-xl font-semibold" id="hand-result-label">Best hand: <span id="hand-result" class="text-green-300"></span></div>
                     </div>
                 </div>
                 <!-- High Score List moved here -->
                 <div id="high-score-list" class="high-score-list">
-                    <h2 id="high-score-title">🏆 <span id="high-score-title-text">High Score</span> <span id="saved-total-score-display"></span></h2>
-                    <ul id="score-list-items">
+                    <h2 id="high-score-title" class="text-xl font-bold text-blue-400 text-center mb-2">🏆 <span id="high-score-title-text">High Score</span> <span id="saved-total-score-display"></span></h2>
+                    <ul id="score-list-items" class="list-unstyled">
                         <!-- Scores will be loaded here with JavaScript -->
                     </ul>
-                    <div id="total-score" class="text-xl font-bold">Total Score: 0</div>
+                    <div id="total-score" class="text-xl font-bold text-green-300 text-center mt-3 pt-2 border-top border-secondary">Total Score: 0</div>
                 </div>
-                <div class="deck-area">
+                <div class="deck-area d-flex flex-column align-items-end gap-1 flex-shrink-0">
                     <div id="deck" class="deck-card flex-shrink-0">
                         <span class="text-5xl">🃏</span>
                     </div>
@@ -482,23 +486,35 @@
                 </div>
             </div>
 
-            <div id="player-hand" class="player-hand flex justify-center flex-wrap gap-4 mb-8">
+            <div id="player-hand" class="player-hand d-flex justify-content-center flex-wrap gap-3 mb-4">
                 <!-- Cards will be loaded here with JavaScript -->
             </div>
 
-            <div class="controls flex flex-col md:flex-row gap-4 w-full justify-center">
-                <button id="draw-button" class="game-button">🔄 Discard selected cards</button>
-                <button id="stand-button" class="game-button bg-green-600 hover:bg-green-700">✋ Stand</button>
-                <button id="continue-game-button" class="game-button bg-yellow-600 hover:bg-yellow-700">▶️ Continue Game</button>
-                <button id="new-game-button" class="game-button bg-purple-600 hover:bg-purple-700 hidden">✨ New Game</button>
+            <div class="controls d-flex flex-column flex-md-row gap-3 w-100 justify-content-center">
+                <button id="draw-button" class="game-button btn btn-primary">🔄 Discard selected cards</button>
+                <button id="stand-button" class="game-button btn btn-success">✋ Stand</button>
+                <button id="continue-game-button" class="game-button btn btn-warning">▶️ Continue Game</button>
+                <button id="new-game-button" class="game-button btn btn-info hidden">✨ New Game</button>
             </div>
         </div>
     </div>
 
-    <!-- Message box for warnings/information -->
-    <div id="message-box" class="message-box">
-        <p id="message-text" class="text-lg font-medium"></p>
-        <button id="message-ok-button">OK</button>
+    <!-- Message box (Bootstrap Modal) -->
+    <div class="modal fade" id="messageBoxModal" tabindex="-1" aria-labelledby="messageBoxModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageBoxModalLabel">Game Message</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="messageBoxBody">
+                    <!-- Message text goes here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
@@ -533,18 +549,14 @@
             document.cookie = name + '=; Max-Age=-99999999;';
         }
 
-        // Function to show message box
+        // Function to show message box (now using Bootstrap Modal)
         function showMessageBox(message) {
-            const messageBox = document.getElementById('message-box');
-            const messageText = document.getElementById('message-text');
-            const messageOkButton = document.getElementById('message-ok-button');
-
-            messageText.textContent = message;
-            messageBox.style.display = 'flex'; // Show message box
-
-            messageOkButton.onclick = () => {
-                messageBox.style.display = 'none'; // Hide message box when OK is clicked
-            };
+            const messageBoxBody = document.getElementById('messageBoxBody');
+            if (messageBoxBody) {
+                messageBoxBody.innerHTML = message;
+            }
+            const messageBoxModal = new bootstrap.Modal(document.getElementById('messageBoxModal'));
+            messageBoxModal.show();
         }
 
         // Card Class
